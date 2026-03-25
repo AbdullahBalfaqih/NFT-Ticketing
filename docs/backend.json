@@ -1,0 +1,108 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents an application user, providing details for login, communication, and optional blockchain wallet association.",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "firstName": { "type": "string" },
+        "lastName": { "type": "string" },
+        "walletAddress": { "type": "string" },
+        "vaultAddress": { "type": "string" },
+        "balance": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "email", "createdAt", "updatedAt"]
+    },
+    "Event": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Event",
+      "type": "object",
+      "description": "Represents an event for which tickets can be sold.",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "time": { "type": "string" },
+        "venue": { "type": "string" },
+        "totalCapacity": { "type": "number" },
+        "ticketPrice": { "type": "number" },
+        "imageUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "sold_out", "cancelled"] }
+      },
+      "required": ["id", "name", "date", "time", "venue", "totalCapacity", "ticketPrice"]
+    },
+    "Resale": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Resale",
+      "type": "object",
+      "description": "Represents a ticket listed for resale in the internal marketplace.",
+      "properties": {
+        "id": { "type": "string" },
+        "ticketId": { "type": "string" },
+        "eventId": { "type": "string" },
+        "sellerId": { "type": "string" },
+        "price": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "completed", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "ticketId", "eventId", "sellerId", "price", "status"]
+    },
+    "Settings": {
+      "title": "Settings",
+      "type": "object",
+      "description": "Global application settings including security and protocol configurations.",
+      "properties": {
+        "powEnabled": { "type": "boolean" },
+        "fingerprintEnabled": { "type": "boolean" },
+        "ipFilteringEnabled": { "type": "boolean" },
+        "maxTicketsPerUser": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["password", "anonymous"]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": { "$ref": "#/backend/entities/User" },
+          "description": "Stores individual user profiles."
+        }
+      },
+      {
+        "path": "/events/{eventId}",
+        "definition": {
+          "entityName": "Event",
+          "schema": { "$ref": "#/backend/entities/Event" },
+          "description": "Contains details for all public events."
+        }
+      },
+      {
+        "path": "/resales/{resaleId}",
+        "definition": {
+          "entityName": "Resale",
+          "schema": { "$ref": "#/backend/entities/Resale" },
+          "description": "Stores official ticket resale listings."
+        }
+      },
+      {
+        "path": "/settings/{settingId}",
+        "definition": {
+          "entityName": "Settings",
+          "schema": { "$ref": "#/backend/entities/Settings" },
+          "description": "Stores global configuration and security protocol settings."
+        }
+      }
+    ]
+  }
+}

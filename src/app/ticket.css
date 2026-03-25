@@ -1,0 +1,173 @@
+/* Vintage Ticket Styles - Specialized for VeriTix */
+
+.ticket-widget {
+  filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.3));
+  width: 255px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  position: relative;
+}
+
+.ticket-widget .top,
+.ticket-widget .bottom,
+.ticket-widget .rip {
+  background-color: #fff;
+}
+
+.ticket-widget .top {
+  border-top-right-radius: 10px;
+  border-top-left-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  overflow: hidden;
+}
+
+.ticket-widget .top > div {
+  padding: 0 18px;
+}
+
+.ticket-widget .top > div:first-child {
+  padding-top: 18px;
+}
+
+.ticket-widget .top img {
+  padding: 15px 0;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+}
+
+.ticket-widget .bandname {
+  font-size: 1.1rem;
+  color: #111;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.ticket-widget .tourname {
+  font-size: 0.7rem;
+  color: #777;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.ticket-widget .-bold {
+  font-weight: bold;
+}
+
+.ticket-widget .deetz {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 15px !important;
+  flex-direction: row-reverse;
+}
+
+.ticket-widget .event {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-widget .date {
+  font-size: 0.65rem;
+  color: #888;
+}
+
+.ticket-widget .location {
+  font-size: 0.8rem;
+  color: #222;
+}
+
+.ticket-widget .price {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.ticket-widget .label {
+  font-size: 0.55rem;
+  color: #aaa;
+  text-transform: uppercase;
+  font-weight: 900;
+}
+
+.ticket-widget .cost {
+  font-size: 1.1rem;
+  color: #2563eb;
+  font-weight: 900;
+}
+
+.ticket-widget .rip {
+  height: 20px;
+  margin: 0 10px;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAACCAYAAAB7Xa1eAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuOWwzfk4AAAAaSURBVBhXY5g7f97/2XPn/AcCBmSMQ+I/AwB2eyNBlrqzUQAAAABJRU5ErkJggg==);
+  background-size: 4px 2px;
+  background-repeat: repeat-x;
+  background-position: center;
+  position: relative;
+  box-shadow: 0 1px 0 0 #fff, 0 -1px 0 0 #fff;
+}
+
+.ticket-widget .rip:before,
+.ticket-widget .rip:after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  background-color: #f5f5f5; /* Matches the grey section background */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.ticket-widget .rip:before {
+  left: -20px;
+  transform: translateY(-50%);
+}
+
+.ticket-widget .rip:after {
+  right: -20px;
+  transform: translateY(-50%);
+}
+
+.ticket-widget .bottom {
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
+  padding: 15px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ticket-widget .barcode {
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF4AAAABCAYAAABXChlMAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuOWwzfk4AAACPSURBVChTXVAJDsMgDOsrVpELiqb+/4c0DgStQ7JMYogNh2gdvg5VfXFCRIZaC6BOtnoNFpvaumNmwb/71Frrm8XvgYkker1/g9WzMOsohaOGNziRs5inDsAn8yEPengTapJ5bmdZ2Yv7VvfPN6AH2NJx7nOWPTf1/78hoqgxhzw3ZqYG1Dr/9ur3y8vMxgNZhcAUnR4xKgAAAABJRU5ErkJggg==);
+  background-repeat: repeat-y;
+  min-width: 58px;
+  height: 30px;
+}
+
+.ticket-widget .buy {
+  display: block;
+  font-size: 11px;
+  font-weight: 900;
+  background-color: #2563eb;
+  padding: 0 15px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 16px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.ticket-widget .buy:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.05);
+}
+
+.--flex-column { display: flex; flex-direction: column; }

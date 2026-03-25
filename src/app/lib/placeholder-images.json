@@ -1,0 +1,35 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "concert-1",
+      "description": "Neon Summer Night Concert",
+      "imageUrl": "https://picsum.photos/seed/concert1/800/600",
+      "imageHint": "concert music"
+    },
+    {
+      "id": "sports-1",
+      "description": "Championship Basketball Game",
+      "imageUrl": "https://picsum.photos/seed/sports1/800/600",
+      "imageHint": "basketball stadium"
+    },
+    {
+      "id": "tech-1",
+      "description": "Web3 Innovation Summit",
+      "imageUrl": "https://picsum.photos/seed/tech1/800/600",
+      "imageHint": "tech conference"
+    },
+    {
+      "id": "feature-pattern",
+      "description": "Abstract Tech Pattern for Card 1",
+      "imageUrl": "https://picsum.photos/seed/pattern1/600/800",
+      "imageHint": "tech abstract"
+    },
+    {
+      "id": "feature-ui",
+      "description": "Dashboard UI Illustration for Card 2",
+      "imageUrl": "https://picsum.photos/seed/ui1/1200/800",
+      "imageHint": "software ui"
+    }
+  ]
+}

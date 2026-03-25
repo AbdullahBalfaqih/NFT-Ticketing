@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 84% 2%;
+    --foreground: 210 40% 98%;
+    --card: 222 84% 3.5%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 84% 2%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 12.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 12.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 213.3 93.9% 67.8%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 12.5%;
+    --input: 217.2 32.6% 12.5%;
+    --ring: 224.3 76.3% 48%;
+    --radius: 1rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html, body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-family: "IBM Plex Sans Arabic", sans-serif;
+    max-width: 100vw;
+    overflow-x: hidden;
+    position: relative;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
+  }
+}
+
+/* منع تحميل أو نسخ الصور */
+.no-copy img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.ibm-plex-sans-arabic-thin { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 100; font-style: normal; }
+.ibm-plex-sans-arabic-extralight { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 200; font-style: normal; }
+.ibm-plex-sans-arabic-light { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 300; font-style: normal; }
+.ibm-plex-sans-arabic-regular { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 400; font-style: normal; }
+.ibm-plex-sans-arabic-medium { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 500; font-style: normal; }
+.ibm-plex-sans-arabic-semibold { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 600; font-style: normal; }
+.ibm-plex-sans-arabic-bold { font-family: "IBM Plex Sans Arabic", sans-serif; font-weight: 700; font-style: normal; }
+
+/* Framer-like smooth interactions & Premium Buttons */
+.mac-transition {
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mac-button {
+  padding-left: 33px;
+  padding-right: 33px;
+  padding-bottom: 16px;
+  padding-top: 16px;
+  border-radius: 12px;
+  background: #2563eb;
+  border: none;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: 0.4s;
+  color: white;
+}
+
+.mac-button:hover {
+  box-shadow: 0 0 40px -10px #2563eb;
+  transform: translateY(-1px);
+}
+
+.mac-button:active {
+  transform: scale(0.97);
+  box-shadow: 0 0 20px -5px #2563eb;
+}
+
+/* --- Terminal Loader Styles --- */
+@keyframes blinkCursor {
+  50% {
+    border-right-color: transparent;
+  }
+}
+
+@keyframes typeAndDelete {
+  0%, 10% { width: 0; }
+  45%, 55% { width: 8.5em; }
+  90%, 100% { width: 0; }
+}
+
+.terminal-loader {
+  border: 0.1em solid #333;
+  background-color: #050505;
+  color: #2563eb;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.9em;
+  padding: 1.5em 1em;
+  width: 100%;
+  max-width: 18em;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.terminal-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1.8em;
+  background-color: #1a1a1a;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 0 0.6em;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.terminal-controls {
+  display: flex;
+  gap: 0.4em;
+}
+
+.control {
+  width: 0.6em;
+  height: 0.6em;
+  border-radius: 50%;
+}
+
+.control.close { background-color: #e33; }
+.control.minimize { background-color: #ee0; }
+.control.maximize { background-color: #0b0; }
+
+.terminal-title {
+  font-size: 0.7em;
+  color: #888;
+  font-weight: bold;
+}
+
+.terminal-text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  border-right: 0.2em solid #2563eb;
+  animation: typeAndDelete 4s steps(15) infinite, blinkCursor 0.5s step-end infinite alternate;
+  margin-top: 1em;
+  font-weight: bold;
+}
+
+.social-login-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.socialcontainer {
+  height: 50px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+.socialcontainer:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(255,255,255,0.1);
+}
+
+/* --- Real-look Barcode --- */
+.barcode-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.5px;
+  height: 100%;
+}
+.barcode-bars div {
+  background-color: currentColor;
+  border-radius: 1px;
+}
