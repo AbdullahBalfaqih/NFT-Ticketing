@@ -1,8 +1,7 @@
 "use client";
-export const dynamic = "force-dynamic";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, Suspense } from "react";
 import Image from "next/image";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,7 @@ import { Event, User as UserProfile } from "@/lib/types";
 import { Progress } from "@/components/ui/progress";
 import { TicketCard } from "@/components/ticket-card";
 
-export default function CheckoutPage() {
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -148,75 +147,71 @@ export default function CheckoutPage() {
   };
 
   const handlePayment = async () => {
-  if (!user || !isVerifiedHuman) return;
-  setIsProcessing(true);
+    if (!user || !isVerifiedHuman) return;
+    setIsProcessing(true);
+    
+    try {
+      const targetMintAddress = (useWallet && userData.walletAddress.startsWith("0x")) 
+        ? userData.walletAddress 
+        : (profile?.vaultAddress || "0x366F94c8e0d9BB37f2534B77168A5FEbA0B261C3");
 
-  try {
-    const targetMintAddress = (useWallet && userData.walletAddress.startsWith("0x")) 
-      ? userData.walletAddress 
-      : (profile?.vaultAddress || "0x366F94c8e0d9BB37f2534B77168A5FEbA0B261C3");
+      const result = await processPurchase(
+        targetMintAddress, 
+        event?.numericId || event?.id || "",
+        securitySettings?.fingerprintEnabled !== false ? deviceFingerprint : "DISABLED",
+        { isHuman: true, timestamp: Date.now() }
+      );
 
-    // استدعاء دافنمارك ديناميكي لوظيفة server
-    const { processPurchase } = await import('@/app/actions/purchase');
+      if (!result.success) throw new Error(result.error);
 
-    const result = await processPurchase(
-      targetMintAddress,
-      event?.numericId || event?.id || "",
-      securitySettings?.fingerprintEnabled !== false ? deviceFingerprint : "DISABLED",
-      { isHuman: true, timestamp: Date.now() }
-    );
+      const finalHash = result.hash;
+      const actualTokenId = result.tokenId || "MINTED";
 
-    if (!result.success) throw new Error(result.error);
-
-    const finalHash = result.hash;
-    const actualTokenId = result.tokenId || "MINTED";
-
-    const orderRef = await addDoc(collection(firestore, "orders"), {
-      userId: user.uid,
-      eventId: event?.id,
-      eventName: event?.name,
-      totalAmount: event?.ticketPrice ? event.ticketPrice * seatIds.length : 0,
-      numberOfTickets: seatIds.length,
-      status: "completed",
-      paymentStatus: "paid",
-      transactionId: finalHash,
-      mintAddress: targetMintAddress,
-      fingerprint: deviceFingerprint,
-      createdAt: serverTimestamp()
-    });
-
-    const newTickets = [];
-    for (const seat of seatIds) {
-      const suffix = finalHash.substring(finalHash.length - 8).toUpperCase();
-      const ticketVCode = `VTX-${suffix}-${seat}`;
-      const ticketData = {
-        orderId: orderRef.id,
+      const orderRef = await addDoc(collection(firestore, "orders"), {
+        userId: user.uid,
         eventId: event?.id,
-        ownerId: user.uid,
-        seatNumber: seat,
-        priceAtPurchase: event?.ticketPrice,
-        nftTokenId: actualTokenId,
-        mintTransactionHash: finalHash,
-        verificationCode: ticketVCode,
-        status: "active",
+        eventName: event?.name,
+        totalAmount: event?.ticketPrice ? event.ticketPrice * seatIds.length : 0,
+        numberOfTickets: seatIds.length,
+        status: "completed",
+        paymentStatus: "paid",
+        transactionId: finalHash,
+        mintAddress: targetMintAddress,
         fingerprint: deviceFingerprint,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      };
-      const tRef = await addDoc(collection(firestore, "tickets"), ticketData);
-      newTickets.push({ ...ticketData, id: tRef.id });
+        createdAt: serverTimestamp()
+      });
+
+      const newTickets = [];
+      for (const seat of seatIds) {
+        const suffix = finalHash.substring(finalHash.length - 8).toUpperCase();
+        const ticketVCode = `VTX-${suffix}-${seat}`;
+        const ticketData = {
+          orderId: orderRef.id,
+          eventId: event?.id,
+          ownerId: user.uid,
+          seatNumber: seat,
+          priceAtPurchase: event?.ticketPrice,
+          nftTokenId: actualTokenId,
+          mintTransactionHash: finalHash,
+          verificationCode: ticketVCode,
+          status: "active",
+          fingerprint: deviceFingerprint,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        };
+        const tRef = await addDoc(collection(firestore, "tickets"), ticketData);
+        newTickets.push({ ...ticketData, id: tRef.id });
+      }
+
+      setPurchasedTickets(newTickets);
+      setTxHash(finalHash);
+      setStep(3);
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "فشلت العملية", description: error.message });
+    } finally {
+      setIsProcessing(false);
     }
-
-    setPurchasedTickets(newTickets);
-    setTxHash(finalHash);
-    setStep(3);
-
-  } catch (error: any) {
-    toast({ variant: "destructive", title: "فشلت العملية", description: error.message });
-  } finally {
-    setIsProcessing(false);
-  }
-};
+  };
 
   if (isEventLoading || isUserLoading || !event) {
     return (
@@ -412,6 +407,18 @@ export default function CheckoutPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <CheckoutContent />
+    </Suspense>
   );
 }
 
