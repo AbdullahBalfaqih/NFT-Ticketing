@@ -22,7 +22,7 @@ import { arSA } from "date-fns/locale";
 
 const rotatingWords = [
   "فعالياتك",
-  "مؤتمراتك",
+  "مؤتمرةك",
   "أنشطتك",
   "مناسباتك",
   "أحداثك",
@@ -137,7 +137,7 @@ export default function Home() {
                 </h1>
                 
                 <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed font-black">
-                  فيري تيكس هو الحل الهجين الأول في المنطقة. تداول تذاكرك كأصول رقمية موثقة (NFT) على شبكة Polygon بكل سهولة وأمان.
+                  إيفين تيكس تشين هو الحل الهجين الأول في المنطقة. تداول تذاكرك كأصول رقمية موثقة (NFT) على شبكة Polygon بكل سهولة وأمان.
                 </p>
                 
                 <div className="flex flex-wrap gap-4 pt-4 justify-start">
@@ -154,18 +154,16 @@ export default function Home() {
                 <div className="relative w-full aspect-square max-w-[600px] flex items-center justify-center">
                   <div className="relative group flex items-center justify-center">
                     <div className="absolute inset-0 bg-primary/30 blur-[100px] rounded-full -z-10 animate-pulse opacity-60 group-hover:opacity-100 transition-opacity duration-1000" />
-                    <div className="relative z-10 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)] pointer-events-none">
-                      <video 
-                        autoPlay 
-                        loop 
-                        muted 
-                        playsInline 
-                        className="w-full h-auto object-contain rounded-3xl"
+                    <div className="relative z-10 drop-shadow-[0_0_35px_rgba(37,99,235,0.4)]">
+                      <Image 
+                        src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1773811328/image-removebg-preview_62_hgwa34.png"
+                        alt="Logo Hero"
+                        width={600}
+                        height={600}
+                        className="object-contain"
+                        priority
                         onContextMenu={(e) => e.preventDefault()}
-                      >
-                        <source src="/Video Project 1.mp4" type="video/mp4" />
-                        متصفحك لا يدعم تشغيل الفيديو.
-                      </video>
+                      />
                     </div>
                   </div>
                 </div>
