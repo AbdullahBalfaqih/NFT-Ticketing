@@ -13,16 +13,14 @@ import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function MarketplacePage() {
-  const firestore = useFirestore();
-  const { isLoading } = useCollection<ResaleListing>(useMemoFirebase(() => query(collection(firestore, "resales"), where("status", "==", "active")), [firestore]));
+const SAR_LOGO = "https://res.cloudinary.com/ddznxtb6f/image/upload/v1774472727/image-removebg-preview_78_zqzygb.png";
 
+export default function MarketplacePage() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-right" dir="rtl">
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12">
-        {/* Marketplace Hero */}
         <section className="text-center mb-16 space-y-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-bold mx-auto">
             <Zap className="h-4 w-4" />
@@ -46,13 +44,12 @@ export default function MarketplacePage() {
           </div>
         </section>
 
-        {/* Info Box */}
         <div className="mb-12 p-6 rounded-[2rem] bg-primary/5 border border-primary/10 flex flex-col md:flex-row items-center gap-6 flex-row-reverse">
            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center text-primary shrink-0">
              <Info className="h-6 w-6" />
            </div>
            <div className="flex-1 text-sm text-muted-foreground">
-             <strong className="text-primary">ملاحظة البروتوكول:</strong> جميع معاملات إعادة البيع تخضع لتحويل ملكية فوري في خزنة فيري تيكس. يتم تحديث الملكية أيضاً على شبكة بوليفون.
+             <strong className="text-primary">ملاحظة البروتوكول:</strong> جميع معاملات إعادة البيع تخضع لتحويل ملكية فوري في خزنة فيري تيكس.
            </div>
            <Badge variant="outline" className="border-primary/30 text-primary">تم فرض سقف 20%</Badge>
         </div>
@@ -143,7 +140,7 @@ function ResaleCard({ resale }: { resale: ResaleListing }) {
       toast({ title: "تم الشراء بنجاح", description: "تم نقل التذكرة إلى خزنتك الرقمية." });
       router.push("/dashboard");
     } catch (err: any) {
-      toast({ variant: "destructive", title: "فشلت العملية", description: err.message });
+      toast({ variant: "destructive", title: "فشل العملية", description: err.message });
     } finally {
       setIsBuying(false);
     }
@@ -170,17 +167,23 @@ function ResaleCard({ resale }: { resale: ResaleListing }) {
         <div className="flex items-center justify-between flex-row-reverse">
           <div className="space-y-1 text-right">
             <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">سعر إعادة البيع</p>
-            <div className="text-3xl font-black text-primary">${resale.price}</div>
+            <div className="text-3xl font-black text-primary flex items-center gap-1 justify-end">
+              {resale.price}
+              <img src={SAR_LOGO} className="h-5 w-auto object-contain" alt="ر.س" />
+            </div>
           </div>
           <div className="text-left space-y-1">
             <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">الأصلي</p>
-            <div className="text-sm font-bold opacity-50 line-through">${ticket.priceAtPurchase}</div>
+            <div className="text-sm font-bold opacity-50 line-through flex items-center gap-1">
+              {ticket.priceAtPurchase}
+              <img src={SAR_LOGO} className="h-2.5 w-auto object-contain grayscale" alt="ر.س" />
+            </div>
           </div>
         </div>
 
         <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest justify-end">
-             موثق بالبروتوكول <ShieldCheck className="h-3 w-3 text-green-500" />
+             موثق بالبروتوكول <ShieldCheck className="h-3 w-3 text-white" />
            </div>
            <p className="text-[9px] text-muted-foreground leading-relaxed">
              هذه التذكرة موقعة تشفيرياً. سيتم نقل الملكية بشكل فوري عند تأكيد الدفع.

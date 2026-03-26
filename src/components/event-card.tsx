@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Event } from "@/lib/types";
 import "@/app/ticket.css";
 
+const SAR_LOGO = "https://res.cloudinary.com/ddznxtb6f/image/upload/v1774472727/image-removebg-preview_78_zqzygb.png";
+
 interface EventCardProps {
   event: Event;
 }
@@ -17,6 +19,7 @@ export function EventCard({ event }: EventCardProps) {
         <img 
           src={event.imageUrl} 
           alt={event.name} 
+          className="event-banner"
           onContextMenu={(e) => e.preventDefault()}
           draggable={false}
         />
@@ -27,7 +30,10 @@ export function EventCard({ event }: EventCardProps) {
           </div>
           <div className="price --flex-column">
             <div className="label">سعر التذكرة</div>
-            <div className="cost -bold">${event.ticketPrice}</div>
+            <div className="cost -bold flex items-center gap-1 justify-end">
+              <span>{event.ticketPrice}</span>
+              <img src={SAR_LOGO} style={{ height: '14px', width: 'auto' }} className="object-contain inline-block" alt="ر.س" />
+            </div>
           </div>
         </div>
       </div>

@@ -14,6 +14,8 @@ import { doc } from "firebase/firestore";
 import { Event } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 
+const SAR_LOGO = "https://res.cloudinary.com/ddznxtb6f/image/upload/v1774472727/image-removebg-preview_78_zqzygb.png";
+
 export default function EventDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -56,7 +58,6 @@ export default function EventDetailsPage() {
   const handleCheckout = () => {
     if (selectedSeats.length === 0) return;
     
-    // فرض تسجيل الدخول قبل الذهاب لصفحة الدفع
     if (!user) {
       toast({
         title: "تسجيل الدخول مطلوب",
@@ -85,7 +86,6 @@ export default function EventDetailsPage() {
         </Button>
 
         <div className="grid lg:grid-cols-3 gap-12">
-          {/* Left Column: Info */}
           <div className="lg:col-span-2 space-y-8 text-right">
             <div className="relative aspect-video rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
               <Image 
@@ -125,10 +125,6 @@ export default function EventDetailsPage() {
               <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {event.description}
               </div>
-              <p className="text-muted-foreground leading-relaxed mt-4">
-                انضم إلينا لتجربة لا تُنسى. هذه الفعالية جزء من سلسلة فعاليات فيري تيكس الموثقة، 
-                مما يعني أن كل تذكرة مصدق عليها رقمياً على السلسلة من أجل أمانك.
-              </p>
             </div>
 
             <div className="space-y-4 pt-8 border-t border-white/5">
@@ -140,24 +136,29 @@ export default function EventDetailsPage() {
             </div>
           </div>
 
-          {/* Right Column: Order Summary (White Version) */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 p-8 rounded-3xl bg-white border border-slate-200 shadow-2xl space-y-6 text-right text-slate-900">
               <h3 className="text-2xl font-headline font-black">ملخص الطلب</h3>
               
               <div className="space-y-4">
-                <div className="flex justify-between items-center text-sm font-bold">
+                <div className="flex justify-between items-center text-sm font-bold flex-row-reverse">
                   <span className="text-slate-500">سعر التذكرة</span>
-                  <span>${event.ticketPrice}</span>
+                  <span className="flex items-center gap-1">
+                    {event.ticketPrice}
+                    <img src={SAR_LOGO} className="h-3 w-auto object-contain" alt="ر.س" />
+                  </span>
                 </div>
-                <div className="flex justify-between items-center text-sm font-bold">
+                <div className="flex justify-between items-center text-sm font-bold flex-row-reverse">
                   <span className="text-slate-500">المقاعد المختارة</span>
                   <span className="text-primary">{selectedSeats.length > 0 ? selectedSeats.join(", ") : "لا يوجد"}</span>
                 </div>
                 <Separator className="bg-slate-100" />
-                <div className="flex justify-between items-center pt-2">
+                <div className="flex justify-between items-center pt-2 flex-row-reverse">
                   <span className="font-black text-lg">الإجمالي</span>
-                  <span className="text-3xl font-black text-primary">${selectedSeats.length * event.ticketPrice}</span>
+                  <span className="flex items-center gap-1 text-3xl font-black text-primary">
+                    {selectedSeats.length * event.ticketPrice}
+                    <img src={SAR_LOGO} className="h-5 w-auto object-contain" alt="ر.س" />
+                  </span>
                 </div>
               </div>
 
@@ -188,10 +189,6 @@ export default function EventDetailsPage() {
                   </>
                 )}
               </Button>
-              
-              <p className="text-center text-[10px] text-slate-400 font-bold">
-                بالنقر على {user ? '"المتابعة للدفع"' : '"سجل الدخول للشراء"'}، فإنك توافق على شروط الخدمة وسياسة التحقق من البلوكشين.
-              </p>
             </div>
           </div>
         </div>

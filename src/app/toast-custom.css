@@ -1,0 +1,85 @@
+
+/* Custom Toast Card Styling - VeriTix Protocol */
+.toast-custom-card {
+  width: 330px;
+  height: 85px;
+  border-radius: 16px;
+  box-sizing: border-box;
+  padding: 10px 15px;
+  background-color: #ffffff;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 20px 50px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 15px;
+  border: none !important;
+  pointer-events: auto;
+}
+
+.toast-wave {
+  position: absolute;
+  transform: rotate(90deg);
+  left: -31px;
+  top: 32px;
+  width: 80px;
+  fill: rgba(37, 99, 235, 0.15);
+}
+
+.toast-icon-container {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(37, 99, 235, 0.1);
+  border-radius: 50%;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.toast-main-icon {
+  width: 18px;
+  height: 18px;
+  color: #2563eb;
+}
+
+.toast-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  flex-grow: 1;
+  text-align: right;
+  gap: 2px;
+}
+
+.toast-title-text {
+  margin: 0;
+  color: #2563eb;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.toast-description-text {
+  margin: 0;
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.toast-close-btn {
+  width: 18px;
+  height: 18px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.toast-close-btn:hover {
+  color: #2563eb;
+}

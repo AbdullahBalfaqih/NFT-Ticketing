@@ -1,8 +1,7 @@
-
 "use client";
 
 import { Navbar } from "@/components/navbar";
-import { QrCode, Loader2, Copy, Check, ExternalLink, Ticket as TicketIcon, Clock, Flame, Wallet, ShieldCheck, Globe, Database, Settings2, Coins, Sparkles, LayoutGrid } from "lucide-react";
+import { QrCode, Loader2, Copy, Check, ExternalLink, Ticket as TicketIcon, Clock, Flame, Wallet, ShieldCheck, Globe, Database, Settings2, Coins, Sparkles, LayoutGrid, Share2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -22,6 +21,7 @@ export default function DashboardPage() {
   const firestore = useFirestore();
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
+  const [copiedTicketId, setCopiedTicketId] = useState<string | null>(null);
   const [isResaleDialogOpen, setIsResaleDialogOpen] = useState(false);
   const [isBurnDialogOpen, setIsBurnDialogOpen] = useState(false);
   const [isQRDialogOpen, setIsQRDialogOpen] = useState(false);
@@ -37,7 +37,6 @@ export default function DashboardPage() {
   const ticketsQuery = useMemoFirebase(() => user ? query(collection(firestore, "tickets"), where("ownerId", "==", user.uid)) : null, [firestore, user]);
   const { data: tickets, isLoading: isTicketsLoading } = useCollection<Ticket>(ticketsQuery);
 
-  // تصنيف التذاكر بناءً على حالتها ودورة حياتها
   const activeTickets = tickets?.filter(t => t.status === 'active' || t.status === 'resale_listed') || [];
   const myNfts = tickets?.filter(t => t.status === 'minted') || [];
   const archiveTickets = tickets?.filter(t => t.status === 'scanned' || t.status === 'burned') || [];
@@ -112,13 +111,22 @@ export default function DashboardPage() {
   };
 
   const copyToClipboard = (text: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     setCopied(true);
+    toast({ title: "تم نسخ العنوان", description: "العنوان جاهز للصق الآن." });
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const displayAddress = profile?.vaultAddress || "جاري التحميل...";
-  const displayBalance = profile?.balance || 0;
+  const copyTicketHash = (hash: string, id: string) => {
+    if (!hash) return;
+    navigator.clipboard.writeText(hash);
+    setCopiedTicketId(id);
+    toast({ title: "تم نسخ عنوان التذكرة (الهاش)", description: "تم نسخ عنوان المعاملة للتحقق في PolygonScan." });
+    setTimeout(() => setCopiedTicketId(null), 2000);
+  };
+
+  const displayAddress = profile?.vaultAddress || profile?.walletAddress || "جاري التحميل...";
 
   return (
     <div className="min-h-screen flex flex-col bg-black text-right" dir="rtl">
@@ -130,25 +138,26 @@ export default function DashboardPage() {
             
             <div className="grid md:grid-cols-2 gap-6 items-start">
               <div className="bg-[#0a0f1a] border border-white/5 rounded-[2rem] p-8 space-y-6 shadow-2xl">
-                
-                
                 <div className="border-t border-white/5 pt-4 space-y-4">
-                  <div className="flex items-center justify-between flex-row-reverse">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold">عنوان الخزنة</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono text-white/60 truncate max-w-[120px]">{displayAddress}</span>
-                      <Button variant="ghost" size="icon" onClick={() => copyToClipboard(displayAddress)} className="h-6 w-6">
-                        {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
-                      </Button>
-                    </div>
+                  <div className="flex items-center justify-between flex-row-reverse mb-2">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold">عنوان الخزنة الموحد</span>
+                    <span className="text-[10px] font-mono text-white/40 truncate max-w-[150px]">{displayAddress}</span>
                   </div>
-                  <Button asChild variant="outline" className="w-full border-white/5 bg-white/5 h-10 rounded-xl gap-2 text-xs">
+                  
+                  <Button 
+                    onClick={() => copyToClipboard(displayAddress)} 
+                    variant="secondary" 
+                    className="w-full h-12 rounded-xl bg-white/5 hover:bg-white/10 text-white font-black gap-2 transition-all border border-white/5"
+                  >
+                    {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                    نسخ العنوان
+                  </Button>
+
+                  <Button asChild variant="outline" className="w-full border-white/5 bg-white/5 h-10 rounded-xl gap-2 text-[10px] font-bold">
                     <Link href="/dashboard/wallet"><Settings2 className="h-4 w-4" /> إدارة المفاتيح والرموز</Link>
                   </Button>
                 </div>
               </div>
-
-               
             </div>
           </div>
           
@@ -198,6 +207,10 @@ export default function DashboardPage() {
                       <div className="flex flex-wrap gap-2 justify-center animate-in fade-in slide-in-from-top-2">
                         <Button size="sm" variant="outline" className="h-10 rounded-xl border-primary/20 bg-primary/5 gap-2" onClick={() => setIsQRDialogOpen(true)}>
                           <QrCode className="h-4 w-4 text-primary" /> كود الدخول
+                        </Button>
+                        <Button size="sm" variant="outline" className="h-10 rounded-xl border-primary/20 bg-primary/5 gap-2" onClick={() => copyTicketHash(ticket.mintTransactionHash || ticket.verificationCode || ticket.id, ticket.id)}>
+                          {copiedTicketId === ticket.id ? <Check className="h-4 w-4 text-primary" /> : <Share2 className="h-4 w-4 text-primary" />}
+                          نسخ عنوان التذكرة
                         </Button>
                         <Button size="sm" variant="outline" className="h-10 rounded-xl border-primary/20 bg-primary/5" onClick={handleOpenResale}>إعادة تداول</Button>
                       </div>
@@ -303,7 +316,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2 text-primary p-3 rounded-xl bg-primary/5 text-xs">
               <Clock className="h-4 w-4" /> بروتوكول مكافحة الجشع: السعر الأقصى هو سعر الشراء + 20%.
             </div>
-            <Input type="number" value={resalePrice} onChange={(e) => setResalePrice(e.target.value)} className="h-14 bg-white/5 text-right font-headline" placeholder="السعر المطلوب ($)" />
+            <Input type="number" value={resalePrice} onChange={(e) => setResalePrice(e.target.value)} className="h-14 bg-white/5 text-right font-headline" placeholder="السعر المطلوب (ر.س)" />
           </div>
           <Button onClick={handleListForResale} disabled={isListing} className="w-full h-14 bg-primary font-bold">{isListing ? <Loader2 className="animate-spin" /> : "إدراج في السوق"}</Button>
         </DialogContent>

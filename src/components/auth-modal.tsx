@@ -15,6 +15,7 @@ import { ethers } from "ethers";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { sendWelcomeEmail } from "@/app/actions/email";
+import "@/app/auth-loader.css";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -76,10 +77,9 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         updatedAt: serverTimestamp()
       });
 
-      // إرسال البريد الترحيبي في الخلفية
       sendWelcomeEmail(signupData.email, signupData.name).catch(console.error);
 
-      toast({ title: "تم إنشاء الخزنة", description: "مرحباً بك في EvenTix Chain! تم إرسال بريد ترحيبي." });
+      toast({ title: "تم إنشاء الخزنة", description: "مرحباً بك في فيري تيكس! تم إرسال بريد ترحيبي." });
       onClose();
     } catch (error: any) {
       toast({ variant: "destructive", title: "فشل التسجيل", description: error.message });
@@ -90,30 +90,51 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   const connectWallet = async () => {
     if (typeof window === "undefined") return;
-    const provider = (window as any).ethereum;
-    if (provider) {
-      try {
-        setIsLoading(true);
-        setLoadingText("جاري ربط المحفظة");
-        const accounts = await provider.request({ method: 'eth_requestAccounts' });
-        const walletAddress = accounts[0];
-        const credential = await signInAnonymously(auth);
-        
-        await setDoc(doc(firestore, "users", credential.user.uid), {
-          id: credential.user.uid,
-          walletAddress: walletAddress,
-          updatedAt: serverTimestamp()
-        }, { merge: true });
-
-        toast({ title: "تم ربط المحفظة", description: "تم الدخول عبر MetaMask." });
-        onClose();
-      } catch (err: any) {
-        toast({ variant: "destructive", title: "خطأ في الاتصال", description: err.message });
-      } finally {
-        setIsLoading(false);
+    
+    try {
+      const ethereum = (window as any).ethereum;
+      if (!ethereum) {
+        window.open('https://metamask.io/download/', '_blank');
+        return;
       }
-    } else {
-      window.open('https://metamask.io/download/', '_blank');
+
+      setIsLoading(true);
+      setLoadingText("جاري ربط المحفظة");
+
+      const provider = ethereum.providers?.find((p: any) => p.isMetaMask) || ethereum;
+
+      if (typeof provider.request !== 'function') {
+        throw new Error("مزود المحفظة لا يدعم بروتوكول الطلبات الحالي.");
+      }
+
+      const accounts = await provider.request({ method: 'eth_requestAccounts' }).catch((err: any) => {
+        throw new Error(err?.message || "رفض المستخدم الاتصال بالمحفظة.");
+      });
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error("لا يوجد حساب نشط.");
+      }
+
+      const walletAddress = accounts[0];
+      const credential = await signInAnonymously(auth);
+      
+      await setDoc(doc(firestore, "users", credential.user.uid), {
+        id: credential.user.uid,
+        walletAddress: walletAddress,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      toast({ title: "تم ربط المحفظة", description: "تم الدخول عبر MetaMask." });
+      onClose();
+    } catch (err: any) {
+      console.warn("Auth Modal wallet error:", err);
+      toast({ 
+        variant: "destructive", 
+        title: "خطأ في الاتصال", 
+        description: err.message || "فشل الاتصال بمحفظتك الرقمية." 
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,13 +171,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <div className="relative w-full h-24 mb-2">
                   <Image 
                     src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1774396174/image-removebg-preview_75_yghhlp.png" 
-                    alt="EvenTix Chain" 
+                    alt="VeriTix" 
                     fill 
                     className="object-contain" 
                   />
                 </div>
                 <div className="space-y-1">
-                  <DialogTitle className="sr-only">EvenTix Chain Auth</DialogTitle>
+                  <DialogTitle className="sr-only">فيري تيكس - دخول البروتوكول</DialogTitle>
                   <DialogDescription className="text-muted-foreground text-xs font-bold">
                     تأمين الملكية الرقمية عبر البلوكشين.
                   </DialogDescription>
@@ -165,8 +186,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
               <Tabs defaultValue="login" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 h-12 bg-white/5 p-1 rounded-xl mb-8">
-                  <TabsTrigger value="login" className="rounded-lg font-black data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-primary mac-transition">دخول</TabsTrigger>
-                  <TabsTrigger value="signup" className="rounded-lg font-black data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-primary mac-transition">إنشاء حساب</TabsTrigger>
+                  <TabsTrigger value="login" className="rounded-lg font-black data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-primary transition-all">دخول</TabsTrigger>
+                  <TabsTrigger value="signup" className="rounded-lg font-black data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-primary transition-all">إنشاء حساب</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="login" className="space-y-4">
@@ -176,7 +197,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <Input 
                         type="email" 
                         placeholder="البريد الإلكتروني" 
-                        className="h-14 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right mac-transition focus:border-primary/50"
+                        className="h-14 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right transition-all focus:border-primary/50"
                         value={loginData.email}
                         onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                         required
@@ -187,13 +208,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <Input 
                         type="password" 
                         placeholder="كلمة المرور" 
-                        className="h-14 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right mac-transition focus:border-primary/50"
+                        className="h-14 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right transition-all focus:border-primary/50"
                         value={loginData.password}
                         onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black text-lg rounded-xl shadow-lg shadow-primary/20 mac-button">
+                    <Button type="submit" className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black text-lg rounded-xl shadow-lg shadow-primary/20">
                       تسجيل الدخول
                     </Button>
                   </form>
@@ -205,7 +226,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <User className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input 
                         placeholder="الاسم الكامل" 
-                        className="h-12 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right mac-transition focus:border-primary/50"
+                        className="h-12 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right transition-all focus:border-primary/50"
                         value={signupData.name}
                         onChange={(e) => setSignupData({...signupData, name: e.target.value})}
                         required
@@ -216,7 +237,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <Input 
                         type="email" 
                         placeholder="البريد الإلكتروني" 
-                        className="h-12 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right mac-transition focus:border-primary/50"
+                        className="h-12 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right transition-all focus:border-primary/50"
                         value={signupData.email}
                         onChange={(e) => setSignupData({...signupData, email: e.target.value})}
                         required
@@ -226,7 +247,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <Input 
                         type="password" 
                         placeholder="كلمة المرور" 
-                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs mac-transition focus:border-primary/50"
+                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs transition-all focus:border-primary/50"
                         value={signupData.password}
                         onChange={(e) => setSignupData({...signupData, password: e.target.value})}
                         required
@@ -234,13 +255,13 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                       <Input 
                         type="password" 
                         placeholder="تأكيد" 
-                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs mac-transition focus:border-primary/50"
+                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs transition-all focus:border-primary/50"
                         value={signupData.confirmPassword}
                         onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
                         required
                       />
                     </div>
-                    <Button type="submit" className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-black rounded-xl mac-button">
+                    <Button type="submit" className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-black rounded-xl">
                       إنشاء الحساب
                     </Button>
                   </form>
@@ -256,7 +277,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 <Button 
                   variant="outline" 
                   onClick={connectWallet}
-                  className="h-14 bg-[#121212] border-white/5 hover:bg-white/5 rounded-xl flex items-center justify-center gap-3 font-black text-white group mac-transition"
+                  className="h-14 bg-[#121212] border-white/5 hover:bg-white/5 rounded-xl flex items-center justify-center gap-3 font-black text-white group"
                 >
                   <div className="relative w-6 h-6 group-hover:scale-110 transition-transform">
                     <Image 

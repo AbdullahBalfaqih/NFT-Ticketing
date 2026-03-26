@@ -13,14 +13,16 @@
   background-color: #ffffff;
   border-radius: 1rem;
   z-index: 10;
-  gap: 0; /* Removed gap to make image side touch the separator area */
+  gap: 0;
   overflow: hidden;
   margin: 0 auto;
   box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  transition: none;
+  animation: none;
 }
 
 .ticket-image-side {
-  width: 58px; /* Slightly wider than the separator position */
+  width: 58px;
   height: 100%;
   flex-shrink: 0;
   overflow: hidden;
@@ -63,7 +65,7 @@
   width: 16px;
   height: 16px;
   border-radius: 16px;
-  background-color: #000; /* Matches dashboard background */
+  background-color: #000;
 }
 
 .separator .span-lines::before {
@@ -75,7 +77,7 @@
   width: 16px;
   height: 16px;
   border-radius: 1rem;
-  background-color: #000; /* Matches dashboard background */
+  background-color: #000;
 }
 
 .content-ticket {
@@ -83,7 +85,7 @@
   justify-content: space-between;
   width: 100%;
   display: flex;
-  padding-left: 10px; /* Space after the separator */
+  padding-left: 10px;
 }
 
 .content-data {
