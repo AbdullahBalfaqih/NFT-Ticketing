@@ -113,7 +113,7 @@ export default function Home() {
               <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700 text-right" dir="rtl">
                 
                 <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-                  المنصة النهائية لتأمين{" "}
+                  الــبـروتــوكــول النهائي لتأمين{" "}
                   <div className="h-[1.2em] inline-flex items-center align-middle overflow-hidden px-2 relative">
                     <AnimatePresence mode="popLayout">
                       <motion.span
@@ -137,7 +137,7 @@ export default function Home() {
                 </h1>
                 
                 <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed font-black">
-                  إيفين تيكس تشين هو الحل الهجين الأول في المنطقة. اشتر وتداول تذاكرك كأصول رقمية موثقة (NFT) على شبكة Polygon بكل سهولة وأمان.
+                  إيفين تيكس تشين هو بروتوكول متقدم لإدارة التذاكر في الشرق الأوسط، حيث يتم إصدار جميع التذاكر على البلوكتشين لضمان الأمان والشفافية، مع خيار تحويلها إلى NFT لتمكين التداول الذكي وإعادة البيع المنظم
                 </p>
                 
                 <div className="flex flex-wrap gap-4 pt-4 justify-start">
