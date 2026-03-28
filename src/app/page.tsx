@@ -133,11 +133,11 @@ export default function Home() {
                       </motion.span>
                     </AnimatePresence>
                   </div>
-                  {" "}على السلسلة
+                  {" "}على الــبـلـوكـتـشـيـن
                 </h1>
                 
                 <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed font-black">
-                  إيفين تيكس تشين هو الحل الهجين الأول في المنطقة. تداول تذاكرك كأصول رقمية موثقة (NFT) على شبكة Polygon بكل سهولة وأمان.
+                  إيفين تيكس تشين هو الحل الهجين الأول في المنطقة. اشتر وتداول تذاكرك كأصول رقمية موثقة (NFT) على شبكة Polygon بكل سهولة وأمان.
                 </p>
                 
                 <div className="flex flex-wrap gap-4 pt-4 justify-start">
