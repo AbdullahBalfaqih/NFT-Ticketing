@@ -22,7 +22,7 @@ import { arSA } from "date-fns/locale";
 
 const rotatingWords = [
   "فعالياتك",
-  "مؤتمرةك",
+  "مؤتمراتك",
   "أنشطتك",
   "مناسباتك",
   "أحداثك",
