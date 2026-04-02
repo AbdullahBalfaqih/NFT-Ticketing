@@ -137,8 +137,11 @@ export default function Home() {
                 </h1>
                 
                 <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed font-black">
-                  إيفين تيكس تشين هو بروتوكول متقدم لإدارة التذاكر في الشرق الأوسط، حيث يتم إصدار جميع التذاكر على البلوكتشين لضمان الأمان والشفافية، مع خيار تحويلها إلى NFT لتمكين التداول الذكي وإعادة البيع المنظم
-                </p>
+نحن نبني طبقة موحدة لسوق التذاكر،
+تمكّن أي منصة من إصدار تذاكر على البلوكتشين،
+التحكم في إعادة بيعها،
+ومنع البوتات —
+مع تحويل كل تذكرة إلى أصل رقمي قابل للتداول والتحكم الكامل.
                 
                 <div className="flex flex-wrap gap-4 pt-4 justify-start">
                   <button onClick={() => setIsAuthOpen(true)} className="mac-button text-lg font-black">
@@ -318,11 +321,10 @@ export default function Home() {
               <Image src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1774396174/image-removebg-preview_75_yghhlp.png" alt="Logo CTA" width={120} height={120} className="relative z-10" onContextMenu={(e) => e.preventDefault()} />
             </div>
             <h2 className="text-3xl md:text-5xl font-headline font-black text-slate-900 max-w-2xl leading-tight mb-6">ابدأ تأمين <span className="text-primary">تجربتك الرقمية</span> اليوم</h2>
-            <p className="text-muted-foreground text-lg md:text-xl max-w-xl mb-10 font-black">نحن نبني طبقة موحدة لسوق التذاكر،
-تمكّن أي منصة من إصدار تذاكر على البلوكتشين،
-التحكم في إعادة بيعها،
-ومنع البوتات —
-مع تحويل كل تذكرة إلى أصل رقمي قابل للتداول والتحكم الكامل.</p>
+            <p className="text-muted-foreground text-lg md:text-xl max-w-xl mb-10 font-black">بعض الحلول تستخدم البلوكتشين لتحسين الأمان،
+لكنها تبقي المستخدم داخل نظام مغلق.
+نحن نفتح النظام — ونمنح المستخدم ملكية حقيقية وقابلية تداول كاملة.
+</p>
             <div className="flex gap-4 flex-col sm:flex-row">
               <button onClick={() => setIsAuthOpen(true)} className="mac-button text-lg font-black">سجل الآن مجاناً</button>
               <Button variant="ghost" asChild className="h-14 px-10 rounded-full text-slate-600 font-black text-lg hover:bg-black/5">
