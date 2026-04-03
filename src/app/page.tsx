@@ -323,7 +323,7 @@ export default function Home() {
             <h2 className="text-3xl md:text-5xl font-headline font-black text-slate-900 max-w-2xl leading-tight mb-6">ابدأ تأمين <span className="text-primary">تجربتك الرقمية</span> اليوم</h2>
             <p className="text-muted-foreground text-lg md:text-xl max-w-xl mb-10 font-black">بعض الحلول تستخدم البلوكتشين لتحسين الأمان،
 لكنها تبقي المستخدم داخل نظام مغلق.
-نحن نفتح النظام — ونمنح المستخدم ملكية حقيقية وقابلية تداول كاملة.
+نحن نفتح النظام — ونمنح المستخدم ملكية حقيقية وقابلية تداول كاملة
 </p>
             <div className="flex gap-4 flex-col sm:flex-row">
               <button onClick={() => setIsAuthOpen(true)} className="mac-button text-lg font-black">سجل الآن مجاناً</button>
