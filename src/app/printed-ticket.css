@@ -1,0 +1,174 @@
+
+/* Printed Ticket Animation Styles */
+
+.ticket-system {
+  max-width: 385px;
+  width: 100%;
+  margin: 0 auto;
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+}
+
+.ticket-system .top {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.ticket-system .top .title {
+  font-weight: 900;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: #fff;
+  opacity: 0.8;
+}
+
+.ticket-system .top .printer {
+  width: 90%;
+  height: 20px;
+  border: 5px solid #fff;
+  border-radius: 10px;
+  box-shadow: 1px 3px 3px 0px rgba(0, 0, 0, 0.2);
+  background: #111;
+  position: relative;
+  z-index: 20;
+}
+
+.ticket-system .receipts-wrapper {
+  overflow: hidden;
+  margin-top: -10px;
+  padding-bottom: 20px;
+}
+
+.ticket-system .receipts {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  transform: translateY(-550px);
+  animation: print-vtx 2.8s 800ms cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+}
+
+.ticket-system .receipt {
+  padding: 25px 30px;
+  text-align: right;
+  min-height: 200px;
+  width: 88%;
+  background-color: #fff;
+  border-radius: 0 0 20px 20px;
+  box-shadow: 1px 3px 8px 3px rgba(0, 0, 0, 0.2);
+  color: #1a1a1a;
+}
+
+.ticket-system .receipt .airliner-logo {
+  max-width: 100px;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+.ticket-system .receipt .route {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  direction: ltr;
+}
+
+.ticket-system .receipt .route h2 {
+  font-weight: 900;
+  font-size: 2.2rem;
+  margin: 0;
+  color: #2563eb;
+}
+
+.ticket-system .receipt .details {
+  display: grid;
+  grid-template-cols: 1fr 1fr;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.ticket-system .receipt .details .item {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticket-system .receipt .details .item span {
+  font-size: 0.7rem;
+  color: #888;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ticket-system .receipt .details .item h3 {
+  font-size: 0.85rem;
+  margin: 5px 0 0;
+  font-weight: bold;
+  color: #111;
+}
+
+.ticket-system .receipt.qr-code {
+  height: 120px;
+  min-height: unset;
+  position: relative;
+  border-radius: 20px 20px 15px 15px;
+  display: flex;
+  align-items: center;
+  margin-top: 2px;
+  padding: 15px 25px;
+}
+
+.ticket-system .receipt.qr-code::before {
+  content: '';
+  background: linear-gradient(to right, #fff 50%, transparent 50%);
+  background-size: 15px 4px;
+  height: 4px;
+  width: 85%;
+  display: block;
+  left: 0;
+  right: 0;
+  top: -2px;
+  position: absolute;
+  margin: auto;
+}
+
+.ticket-system .receipt.qr-code .qr {
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+
+.ticket-system .receipt.qr-code .description {
+  margin-right: 20px;
+  text-align: right;
+  flex: 1;
+}
+
+.ticket-system .receipt.qr-code .description h2 {
+  margin: 0 0 2px 0;
+  font-size: 0.9rem;
+  font-weight: 900;
+  color: #2563eb;
+}
+
+.ticket-system .receipt.qr-code .description p {
+  margin: 0;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #666;
+}
+
+@keyframes print-vtx {
+  0% {
+    transform: translateY(-550px);
+  }
+  35% {
+    transform: translateY(-400px);
+  }
+  70% {
+    transform: translateY(-150px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}

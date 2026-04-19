@@ -16,7 +16,7 @@ export async function sendWelcomeEmail(toEmail: string, userName: string) {
     },
   });
 
-  const logoUrl = 'https://res.cloudinary.com/ddznxtb6f/image/upload/v1774396174/image-removebg-preview_75_yghhlp.png';
+  const logoUrl = 'https://res.cloudinary.com/ddznxtb6f/image/upload/q_auto/f_auto/v1776511752/image-removebg-preview_98_zrfpns.png';
 
   const htmlContent = `
     <div style="background-color: #000000; color: #ffffff; padding: 40px; font-family: 'Zain', Arial, sans-serif; text-align: right; border-radius: 20px; max-width: 600px; margin: 0 auto;" dir="rtl">

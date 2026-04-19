@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, Suspense, useEffect } from "react";
@@ -19,6 +18,8 @@ import { sendWelcomeEmail } from "@/app/actions/email";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { motion, AnimatePresence } from "framer-motion";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PolicyDialog } from "@/components/policy-dialog";
 import "@/app/auth-loader.css";
 
 function AuthContainer() {
@@ -31,6 +32,8 @@ function AuthContainer() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("جاري التحميل");
   const [activeTab, setActiveTab] = useState(searchParams.get("mode") === "signup" ? "signup" : "login");
+  const [showPolicy, setShowPolicy] = useState(false);
+  const [isAccepted, setIsAccepted] = useState(false);
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -39,6 +42,7 @@ function AuthContainer() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
     setLoadingText("جاري تسجيل الدخول");
     try {
@@ -54,6 +58,11 @@ function AuthContainer() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
+    if (!isAccepted) {
+      toast({ variant: "destructive", title: "تنبيه", description: "يرجى الموافقة على سياسة الخصوصية للمتابعة." });
+      return;
+    }
     if (signupData.password !== signupData.confirmPassword) {
       toast({ variant: "destructive", title: "خطأ", description: "كلمات المرور غير متطابقة." });
       return;
@@ -94,33 +103,38 @@ function AuthContainer() {
   };
 
   const connectWallet = async () => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || isLoading) return;
     
+    setIsLoading(true);
+    setLoadingText("جاري ربط المحفظة");
+
     try {
       const ethereum = (window as any).ethereum;
       if (!ethereum) {
         window.open('https://metamask.io/download/', '_blank');
+        setIsLoading(false);
         return;
       }
 
-      setIsLoading(true);
-      setLoadingText("جاري ربط المحفظة");
-
-      const provider = ethereum.providers?.find((p: any) => p.isMetaMask) || ethereum;
-
-      if (typeof provider.request !== 'function') {
-        throw new Error("لم يتم العثور على طريقة الاتصال في مزود المحفظة.");
-      }
-
-      const accounts = await provider.request({ method: 'eth_requestAccounts' }).catch((reqErr: any) => {
-        throw new Error(reqErr?.message || "تم رفض طلب الاتصال من قبل المستخدم أو الإضافة.");
-      });
+      // محاولة طلب الحسابات ومعالجة الخطأ -32002 داخلياً
+      const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
+        .catch((err: any) => {
+          if (err.code === -32002) {
+            throw new Error("هناك طلب اتصال معلق بالفعل في MetaMask. يرجى مراجعة الإضافة يدوياً.");
+          }
+          if (err.code === 4001) {
+            throw new Error("تم رفض طلب الاتصال من قبل المستخدم.");
+          }
+          throw err;
+        });
 
       if (!accounts || accounts.length === 0) {
         throw new Error("لم يتم اختيار أي حساب للاتصال.");
       }
 
       const walletAddress = accounts[0];
+      
+      // تسجيل دخول مجهول في Firebase لربط المحفظة
       const credential = await signInAnonymously(auth);
       
       await setDoc(doc(firestore, "users", credential.user.uid), {
@@ -132,11 +146,11 @@ function AuthContainer() {
       toast({ title: "تم ربط المحفظة", description: "تم الدخول عبر المحفظة بنجاح." });
       router.push(returnTo);
     } catch (err: any) {
-      console.warn("Wallet connection error:", err);
+      console.error("MetaMask Connection Suppressed:", err);
       toast({ 
         variant: "destructive", 
-        title: "خطأ في الاتصال", 
-        description: err.message || "تعذر الاتصال بالمحفظة. تأكد من فتح الإضافة وتسجيل الدخول فيها." 
+        title: "تنبيه البروتوكول", 
+        description: err.message || "تعذر الاتصال بالمحفظة. تأكد من فتح إضافة MetaMask."
       });
     } finally {
       setIsLoading(false);
@@ -148,8 +162,8 @@ function AuthContainer() {
       <div className="text-center space-y-4">
         <div className="relative w-full h-24 mb-2">
           <Image 
-            src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1774396174/image-removebg-preview_75_yghhlp.png" 
-            alt="VeriTix" 
+            src="https://res.cloudinary.com/ddznxtb6f/image/upload/q_auto/f_auto/v1776511752/image-removebg-preview_98_zrfpns.png" 
+            alt="VeriTix Logo" 
             fill 
             className="object-contain" 
             priority
@@ -197,22 +211,20 @@ function AuthContainer() {
                   <TabsContent value="login" className="space-y-4">
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div className="relative group">
-                        <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input 
                           type="email" 
                           placeholder="البريد الإلكتروني" 
-                          className="h-14 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
+                          className="h-14 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
                           value={loginData.email}
                           onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                           required
                         />
                       </div>
                       <div className="relative group">
-                        <Lock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input 
                           type="password" 
                           placeholder="كلمة المرور" 
-                          className="h-14 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
+                          className="h-14 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
                           value={loginData.password}
                           onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                           required
@@ -226,27 +238,21 @@ function AuthContainer() {
 
                   <TabsContent value="signup" className="space-y-4">
                     <form onSubmit={handleSignup} className="space-y-4">
-                      <div className="relative group">
-                        <User className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input 
-                          placeholder="الاسم الكامل" 
-                          className="h-12 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
-                          value={signupData.name}
-                          onChange={(e) => setSignupData({...signupData, name: e.target.value})}
-                          required
-                        />
-                      </div>
-                      <div className="relative group">
-                        <Mail className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-                        <Input 
-                          type="email" 
-                          placeholder="البريد الإلكتروني" 
-                          className="h-12 pr-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
-                          value={signupData.email}
-                          onChange={(e) => setSignupData({...signupData, email: e.target.value})}
-                          required
-                        />
-                      </div>
+                      <Input 
+                        placeholder="الاسم الكامل" 
+                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
+                        value={signupData.name}
+                        onChange={(e) => setSignupData({...signupData, name: e.target.value})}
+                        required
+                      />
+                      <Input 
+                        type="email" 
+                        placeholder="البريد الإلكتروني" 
+                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
+                        value={signupData.email}
+                        onChange={(e) => setSignupData({...signupData, email: e.target.value})}
+                        required
+                      />
                       <div className="grid grid-cols-2 gap-3">
                         <Input 
                           type="password" 
@@ -265,6 +271,26 @@ function AuthContainer() {
                           required
                         />
                       </div>
+
+                      <div className="flex items-start gap-3 py-2 px-1">
+                        <Checkbox 
+                          id="page-terms" 
+                          checked={isAccepted} 
+                          onCheckedChange={(val) => setIsAccepted(val as boolean)}
+                          className="mt-1 border-white/20 data-[state=checked]:bg-primary"
+                        />
+                        <label htmlFor="page-terms" className="text-[10px] leading-relaxed text-muted-foreground font-bold cursor-pointer">
+                          أوافق على{" "}
+                          <button 
+                            type="button"
+                            onClick={() => setShowPolicy(true)} 
+                            className="text-primary hover:underline underline-offset-4 font-black"
+                          >
+                            سياسة الخصوصية وأحكام الاستخدام
+                          </button>
+                        </label>
+                      </div>
+
                       <Button type="submit" className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-black rounded-xl">
                         إنشاء الحساب
                       </Button>
@@ -299,6 +325,8 @@ function AuthContainer() {
           </AnimatePresence>
         </CardContent>
       </Card>
+
+      <PolicyDialog isOpen={showPolicy} onClose={() => setShowPolicy(false)} />
     </div>
   );
 }

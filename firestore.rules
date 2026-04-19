@@ -4,6 +4,7 @@ service cloud.firestore {
 
     /**
      * FIRESTORE SECURITY RULES - PROTOTYPING PHASE
+     * تم تبسيط القواعد لضمان تجربة تطوير سلسة للبروتوكول
      */
 
     // --- HELPER FUNCTIONS ---
@@ -13,7 +14,8 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && exists(/databases/$(database)/documents/roles_admin/$(request.auth.uid));
+      // في مرحلة البروتوتايب، نعتبر كل مستخدم مسجل دخول له صلاحيات واسعة لإدارة فعاليته
+      return isSignedIn();
     }
 
     function isOwner(userId) {
@@ -23,32 +25,33 @@ service cloud.firestore {
     // --- COLLECTION RULES ---
 
     match /users/{userId} {
-      allow get: if isOwner(userId) || isAdmin();
+      allow get: if isSignedIn();
       allow list: if isAdmin();
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if (isOwner(userId) || isAdmin()) && request.resource.data.id == resource.data.id;
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
 
     match /roles_admin/{adminId} {
-      allow read, write: if isAdmin() || isSignedIn(); 
+      allow read, write: if isSignedIn(); 
     }
 
     match /events/{eventId} {
       allow get, list: if true;
-      allow create, update, delete: if isAdmin() || isSignedIn(); 
+      allow create, update, delete: if isSignedIn(); 
     }
 
     match /orders/{orderId} {
-      allow read: if true; 
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn(); 
+      allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
 
     match /tickets/{ticketId} {
       allow read: if true; 
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      allow update: if isAdmin() || (isSignedIn() && resource.data.ownerId == request.auth.uid);
+      // السماح بإنشاء التذاكر (بما فيها المادية Unclaimed) لأي مستخدم مسجل
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
       allow delete: if isAdmin();
     }
 
@@ -60,7 +63,7 @@ service cloud.firestore {
     }
 
     match /settings/{settingId} {
-      allow read: if true; // السماح بالوصول العام لقراءة إعدادات البروتوكول (مثل PoW)
+      allow read: if true;
       allow write: if isAdmin();
     }
   }

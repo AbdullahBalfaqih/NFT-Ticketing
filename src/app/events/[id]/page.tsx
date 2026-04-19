@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
@@ -5,7 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { Navbar } from "@/components/navbar";
 import { SeatMap } from "@/components/seat-map";
-import { Calendar, MapPin, Users, ChevronLeft, CreditCard, ShieldCheck, Loader2, LogIn } from "lucide-react";
+import { Calendar, MapPin, Users, ChevronLeft, CreditCard, ShieldCheck, Loader2, LogIn, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -71,6 +72,8 @@ export default function EventDetailsPage() {
     router.push(`/checkout?eventId=${event.id}&seats=${selectedSeats.join(",")}`);
   };
 
+  const isConference = event.eventType === 'conference';
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
@@ -97,7 +100,9 @@ export default function EventDetailsPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <div className="absolute bottom-8 right-8 text-right">
-                <Badge className="bg-primary text-primary-foreground mb-4 font-bold">تجربة موثقة</Badge>
+                <Badge className="bg-primary text-primary-foreground mb-4 font-bold">
+                  {isConference ? 'مؤتمر موثق' : 'تجربة موثقة'}
+                </Badge>
                 <h1 className="text-4xl md:text-5xl font-headline font-bold">{event.name}</h1>
               </div>
             </div>
@@ -115,51 +120,77 @@ export default function EventDetailsPage() {
               </div>
               <div className="p-6 rounded-2xl bg-card border border-white/5">
                 <Users className="h-6 w-6 text-primary mb-3" />
-                <div className="text-sm font-bold">السعة</div>
+                <div className="text-sm font-bold">{isConference ? 'عدد المدعوين' : 'السعة'}</div>
                 <div className="text-sm text-muted-foreground">{event.totalCapacity.toLocaleString()} إجمالي</div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <h2 className="text-2xl font-headline font-bold">عن هذه الفعالية</h2>
+              <h2 className="text-2xl font-headline font-bold">عن {isConference ? 'هذا المؤتمر' : 'هذه الفعالية'}</h2>
               <div className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                 {event.description}
               </div>
             </div>
 
-            <div className="space-y-4 pt-8 border-t border-white/5">
-              <h2 className="text-2xl font-headline font-bold">اختر مقاعدك</h2>
-              <p className="text-sm text-muted-foreground mb-4">يمكنك اختيار حتى 6 مقاعد. سيتم حجز اختياراتك لمدة 10 دقائق.</p>
-              <div className="rounded-3xl bg-card border border-white/5 overflow-hidden">
-                <SeatMap onSeatSelect={setSelectedSeats} />
+            {!isConference && (
+              <div className="space-y-4 pt-8 border-t border-white/5 animate-in fade-in">
+                <h2 className="text-2xl font-headline font-bold">اختر مقاعدك</h2>
+                <p className="text-sm text-muted-foreground mb-4">يمكنك اختيار حتى 6 مقاعد. سيتم حجز اختياراتك لمدة 10 دقائق.</p>
+                <div className="rounded-3xl bg-card border border-white/5 overflow-hidden">
+                  <SeatMap onSeatSelect={setSelectedSeats} />
+                </div>
               </div>
-            </div>
+            )}
+
+            {isConference && (
+              <div className="p-10 rounded-[2.5rem] bg-primary/5 border border-primary/10 space-y-6 text-center animate-in zoom-in-95">
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto text-primary">
+                  <ShieldCheck className="h-8 w-8" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-2xl font-black">الدخول عبر البطاقات المادية</h3>
+                  <p className="text-muted-foreground font-bold">هذا المؤتمر مخصص لأصحاب الدعوات فقط. يرجى إبراز بطاقتك الفيزيائية عند بوابة الدخول ومسح الباركود للمطالبة بملكية الـ NFT التذكاري.</p>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="lg:col-span-1">
             <div className="sticky top-24 p-8 rounded-3xl bg-white border border-slate-200 shadow-2xl space-y-6 text-right text-slate-900">
-              <h3 className="text-2xl font-headline font-black">ملخص الطلب</h3>
+              <h3 className="text-2xl font-headline font-black">{isConference ? 'حالة الدعوة' : 'ملخص الطلب'}</h3>
               
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm font-bold flex-row-reverse">
-                  <span className="text-slate-500">سعر التذكرة</span>
-                  <span className="flex items-center gap-1">
-                    {event.ticketPrice}
-                    <img src={SAR_LOGO} className="h-3 w-auto object-contain" alt="ر.س" />
-                  </span>
+                  <span className="text-slate-500">نوع الفعالية</span>
+                  <span className="text-primary font-black">{isConference ? 'مؤتمر / دعوة خاصة' : 'بيع عام'}</span>
                 </div>
-                <div className="flex justify-between items-center text-sm font-bold flex-row-reverse">
-                  <span className="text-slate-500">المقاعد المختارة</span>
-                  <span className="text-primary">{selectedSeats.length > 0 ? selectedSeats.join(", ") : "لا يوجد"}</span>
-                </div>
-                <Separator className="bg-slate-100" />
-                <div className="flex justify-between items-center pt-2 flex-row-reverse">
-                  <span className="font-black text-lg">الإجمالي</span>
-                  <span className="flex items-center gap-1 text-3xl font-black text-primary">
-                    {selectedSeats.length * event.ticketPrice}
-                    <img src={SAR_LOGO} className="h-5 w-auto object-contain" alt="ر.س" />
-                  </span>
-                </div>
+                {!isConference ? (
+                  <>
+                    <div className="flex justify-between items-center text-sm font-bold flex-row-reverse">
+                      <span className="text-slate-500">سعر التذكرة</span>
+                      <span className="flex items-center gap-1">
+                        {event.ticketPrice}
+                        <img src={SAR_LOGO} className="h-3 w-auto object-contain" alt="ر.س" />
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm font-bold flex-row-reverse">
+                      <span className="text-slate-500">المقاعد المختارة</span>
+                      <span className="text-primary">{selectedSeats.length > 0 ? selectedSeats.join(", ") : "لا يوجد"}</span>
+                    </div>
+                    <Separator className="bg-slate-100" />
+                    <div className="flex justify-between items-center pt-2 flex-row-reverse">
+                      <span className="font-black text-lg">الإجمالي</span>
+                      <span className="flex items-center gap-1 text-3xl font-black text-primary">
+                        {selectedSeats.length * event.ticketPrice}
+                        <img src={SAR_LOGO} className="h-5 w-auto object-contain" alt="ر.س" />
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-4 rounded-xl bg-slate-50 text-center font-black text-slate-400">
+                    لا تتوفر مبيعات رقمية لهذا الحدث
+                  </div>
+                )}
               </div>
 
               <div className="p-5 rounded-2xl bg-primary/5 border border-primary/10 space-y-2">
@@ -168,27 +199,36 @@ export default function EventDetailsPage() {
                   <ShieldCheck className="h-4 w-4" />
                 </div>
                 <p className="text-[11px] text-slate-500 font-bold text-right leading-relaxed">
-                  سيتم تأمين عملية الشراء الخاصة بك عبر سك NFT على شبكة بوليفون. لا يتم تطبيق أي رسوم غاز.
+                  سيتم توثيق كافة {isConference ? 'الدعوات' : 'عمليات الشراء'} عبر سجلات البلوكشين لضمان عدم التلاعب.
                 </p>
               </div>
 
-              <Button 
-                onClick={handleCheckout}
-                disabled={selectedSeats.length === 0}
-                className="w-full h-16 text-lg font-black bg-primary hover:bg-primary/90 text-white rounded-2xl shadow-xl shadow-primary/20 group transition-all"
-              >
-                {user ? (
-                  <>
-                    المتابعة للدفع
-                    <CreditCard className="ml-2 h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
-                  </>
-                ) : (
-                  <>
-                    سجل الدخول للشراء
-                    <LogIn className="ml-2 h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
-                  </>
-                )}
-              </Button>
+              {!isConference ? (
+                <Button 
+                  onClick={handleCheckout}
+                  disabled={selectedSeats.length === 0}
+                  className="w-full h-16 text-lg font-black bg-primary hover:bg-primary/90 text-white rounded-2xl shadow-xl shadow-primary/20 group transition-all"
+                >
+                  {user ? (
+                    <>
+                      المتابعة للدفع
+                      <CreditCard className="ml-2 h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
+                    </>
+                  ) : (
+                    <>
+                      سجل الدخول للشراء
+                      <LogIn className="ml-2 h-5 w-5 group-hover:-translate-y-0.5 transition-transform" />
+                    </>
+                  )}
+                </Button>
+              ) : (
+                <Button 
+                  disabled
+                  className="w-full h-16 text-lg font-black bg-slate-100 text-slate-400 rounded-2xl cursor-not-allowed"
+                >
+                  دخول بالبطاقة المادية فقط
+                </Button>
+              )}
             </div>
           </div>
         </div>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -27,6 +28,7 @@ export function Navbar() {
   };
 
   const navLinks = [
+    { href: "/solution-mechanism", label: "آلية الحل" },
     { href: "/marketplace", label: "السوق الموثق" },
     { href: "/developers", label: "المطورين" },
     { href: "/verify", label: "مركز التحقق" },
@@ -41,10 +43,10 @@ export function Navbar() {
           {/* Left Section: Logo Only - Bigger Size */}
           <div className="flex items-center justify-start flex-1 h-full">
             <Link href="/" className="flex items-center group h-full">
-              <div className="relative w-36 h-full transition-transform duration-300 group-hover:scale-105">
+              <div className="relative w-40 h-full transition-transform duration-300 group-hover:scale-105">
                 <Image 
-                  src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1774396174/image-removebg-preview_75_yghhlp.png" 
-                  alt="Logo" 
+                  src="https://res.cloudinary.com/ddznxtb6f/image/upload/q_auto/f_auto/v1776511752/image-removebg-preview_98_zrfpns.png" 
+                  alt="EvenTix Logo" 
                   fill 
                   className="object-contain" 
                 />

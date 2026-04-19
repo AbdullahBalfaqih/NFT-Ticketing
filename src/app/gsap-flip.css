@@ -1,0 +1,74 @@
+
+.gsap-flip-wrapper {
+  --color-blue: #2563eb;
+  --color-pink: #ec4899;
+  --color-ui-blue-lt: #60a5fa;
+  --color-ui-blue: #3b82f6;
+  --color-surface-white: #ffffff;
+  background: black;
+  width: 100%;
+  overflow: hidden;
+}
+
+.gsap-flip-container {
+  display: flex;
+  height: 50vh;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  background: black;
+}
+
+.gsap-flip-container.grid, 
+.gsap-flip-container.columns {
+  align-content: stretch;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.letter {
+  text-align: center;
+  color: black;
+  font-size: 10vmax;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 10px;
+  margin: 2px;
+  border-radius: 12px;
+}
+
+.gsap-flip-container.grid .letter {
+  flex-basis: calc(50% - 4px);
+}
+
+.gsap-flip-container.columns .letter {
+  flex-basis: calc(25% - 4px);
+}
+
+.tix-text {
+  font-size: 8vmax;
+  color: var(--color-surface-white);
+  margin-left: 1.5vmax;
+  font-weight: 900;
+  display: none;
+  color: var(--color-blue);
+}
+
+.gsap-flip-container.final .tix-text {
+  display: block;
+}
+
+.E1 { background: var(--color-blue); }
+.V { background: var(--color-ui-blue-lt); } /* تم تغيير اللون من الوردي إلى الأزرق الفاتح */
+.E2 { background: var(--color-ui-blue-lt); }
+.N { background: var(--color-ui-blue); }
+
+.gsap-flip-container.plain .letter {
+  background: transparent;
+  color: var(--color-surface-white);
+  padding: 0;
+}

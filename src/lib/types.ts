@@ -1,5 +1,6 @@
 
 export type EventStatus = 'active' | 'sold_out' | 'cancelled';
+export type EventType = 'conference' | 'match' | 'general';
 
 export interface NFTConfig {
   title: string;
@@ -18,6 +19,7 @@ export interface Event {
   ticketPrice: number;
   imageUrl: string;
   status: EventStatus;
+  eventType?: EventType;
   numericId?: string;
   nftConfig?: NFTConfig;
 }
@@ -60,16 +62,16 @@ export interface Order {
 
 export interface Ticket {
   id: string;
-  orderId: string;
+  orderId?: string;
   eventId: string;
-  ownerId: string;
+  ownerId: string | null;
   seatNumber: string;
   priceAtPurchase: number;
   nftTokenId?: string;
   mintTransactionHash?: string;
   verificationCode?: string;
   isBlockchain?: boolean;
-  status: 'pending_mint' | 'minted' | 'transferred' | 'scanned' | 'active' | 'resale_listed' | 'burned';
+  status: 'pending_mint' | 'minted' | 'transferred' | 'scanned' | 'active' | 'resale_listed' | 'burned' | 'physical_unclaimed';
   lockedUntil?: any; 
   createdAt: any;
   updatedAt: any;

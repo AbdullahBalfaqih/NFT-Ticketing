@@ -3,7 +3,7 @@
 import { Navbar } from "@/components/navbar";
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { ChevronLeft, Wand2, Loader2, Sparkles, Image as ImageIcon, MapPin, Calendar, Clock, DollarSign, Users, Database, Fingerprint, RefreshCcw, Upload, AlertCircle } from "lucide-react";
+import { ChevronLeft, Wand2, Loader2, Sparkles, Image as ImageIcon, MapPin, Calendar, Clock, DollarSign, Users, Database, Fingerprint, RefreshCcw, Upload, AlertCircle, ShieldCheck, Ticket } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { cn } from "@/lib/utils";
 
 export default function EditEventPage() {
   const router = useRouter();
@@ -31,6 +32,7 @@ export default function EditEventPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [eventType, setEventType] = useState<'conference' | 'match'>('match');
   
   const [formData, setFormData] = useState({
     name: "",
@@ -58,13 +60,14 @@ export default function EditEventPage() {
         date: event.date || "",
         time: event.time || "",
         venue: event.venue || "",
-        price: event.ticketPrice?.toString() || "",
-        capacity: event.totalCapacity?.toString() || "",
+        price: event.ticketPrice?.toString() || "0",
+        capacity: event.totalCapacity?.toString() || "0",
         imageUrl: event.imageUrl || "",
         nftTitle: event.nftConfig?.title || "",
         nftDescription: event.nftConfig?.description || "",
         numericId: event.numericId || ""
       });
+      setEventType(event.eventType || 'match');
     }
   }, [event]);
 
@@ -92,17 +95,6 @@ export default function EditEventPage() {
     setIsUploading(true);
     setUploadProgress(0);
 
-    const timeoutId = setTimeout(() => {
-      if (isUploading) {
-        setIsUploading(false);
-        toast({ 
-          variant: "destructive", 
-          title: "انتهت مهلة التحديث", 
-          description: "تعذر الرفع، يرجى فحص حالة خدمة Storage وإعدادات CORS." 
-        });
-      }
-    }, 30000);
-
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `events/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
@@ -116,32 +108,25 @@ export default function EditEventPage() {
           setUploadProgress(progress);
         }, 
         (error) => {
-          clearTimeout(timeoutId);
           console.error("Update Upload Error:", error);
           setIsUploading(false);
-          toast({ 
-            variant: "destructive", 
-            title: "فشل الرفع", 
-            description: "تأكد من تفعيل Storage و CORS في كونسول Firebase." 
-          });
+          toast({ variant: "destructive", title: "فشل الرفع" });
         }, 
         async () => {
-          clearTimeout(timeoutId);
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
           setFormData(prev => ({ ...prev, imageUrl: downloadURL }));
           setIsUploading(false);
-          toast({ title: "تم التحديث", description: "تم تحديث رابط صورة الـ NFT بنجاح." });
+          toast({ title: "تم التحديث", description: "تم تحديث رابط الصورة بنجاح." });
         }
       );
     } catch (error: any) {
-      clearTimeout(timeoutId);
       setIsUploading(false);
     }
   };
 
   const handleSave = async () => {
-    if (!formData.name || !formData.date || !formData.price) {
-      toast({ variant: "destructive", title: "Missing Fields", description: "Name, Date, and Price are required." });
+    if (!formData.name || !formData.date) {
+      toast({ variant: "destructive", title: "حقول ناقصة", description: "الاسم والتاريخ مطلوبان." });
       return;
     }
 
@@ -154,8 +139,9 @@ export default function EditEventPage() {
         time: formData.time,
         venue: formData.venue,
         totalCapacity: parseInt(formData.capacity) || 0,
-        ticketPrice: parseFloat(formData.price) || 0,
-        imageUrl: formData.imageUrl || `https://picsum.photos/seed/${Math.random()}/800/600`,
+        ticketPrice: eventType === 'conference' ? 0 : (parseFloat(formData.price) || 0),
+        imageUrl: formData.imageUrl,
+        eventType: eventType,
         nftConfig: {
           title: formData.nftTitle || formData.name,
           description: formData.nftDescription || formData.description,
@@ -166,10 +152,10 @@ export default function EditEventPage() {
 
       await updateDoc(eventRef, eventData);
       
-      toast({ title: "Updated Successfully", description: "Event changes are now live on-chain and in-app." });
+      toast({ title: "تم التحديث بنجاح", description: "تم حفظ التعديلات وتحديث حالة البروتوكول." });
       router.push("/admin");
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Update Error", description: error.message });
+      toast({ variant: "destructive", title: "خطأ في التحديث", description: error.message });
     } finally {
       setIsSaving(false);
     }
@@ -194,19 +180,39 @@ export default function EditEventPage() {
 
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-8">
-            <div className="space-y-2">
+            <div className="space-y-4">
               <h1 className="text-4xl font-headline font-bold">تعديل <span className="text-primary">التجربة</span></h1>
-              <p className="text-muted-foreground">تعديل بارامترات الفعالية ومجموعة الـ NFT.</p>
+              
+              <div className="flex p-1 bg-white/5 rounded-2xl border border-white/10 w-fit">
+                <button 
+                  onClick={() => setEventType('conference')}
+                  className={cn(
+                    "px-6 py-3 rounded-xl font-black text-sm transition-all flex items-center gap-2",
+                    eventType === 'conference' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:text-white"
+                  )}
+                >
+                  <ShieldCheck className="h-4 w-4" /> مؤتمر / دعوة خاصة
+                </button>
+                <button 
+                  onClick={() => setEventType('match')}
+                  className={cn(
+                    "px-6 py-3 rounded-xl font-black text-sm transition-all flex items-center gap-2",
+                    eventType === 'match' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:text-white"
+                  )}
+                >
+                  <Ticket className="h-4 w-4" /> مباراة / فعالية عامة
+                </button>
+              </div>
             </div>
 
             <div className="space-y-6 bg-card/50 p-8 rounded-3xl border border-white/5">
               <h3 className="text-lg font-bold flex items-center gap-2 justify-end">
-                <Sparkles className="h-5 w-5 text-primary" /> تفاصيل أساسية
+                <Sparkles className="h-5 w-5 text-primary" /> التفاصيل الفنية
               </h3>
               <div className="grid md:grid-cols-2 gap-4 text-right">
                 <div className="space-y-2 md:col-span-2">
                   <Label>اسم الفعالية</Label>
-                  <Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="bg-white/5 text-right" />
+                  <Input value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} className="bg-white/5 text-right h-12" />
                 </div>
                 <div className="space-y-2">
                   <Label>الثيم</Label>
@@ -231,67 +237,26 @@ export default function EditEventPage() {
 
             <div className="space-y-6 bg-primary/5 p-8 rounded-3xl border border-primary/20">
               <h3 className="text-lg font-bold flex items-center gap-2 text-primary justify-end">
-                <Fingerprint className="h-5 w-5" /> أصول الـ NFT المرئية
+                <Fingerprint className="h-5 w-5" /> هوية الـ NFT التذكاري
               </h3>
               
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label>صورة الـ NFT</Label>
+                  <Label>صورة الأصل الرقمي</Label>
                   <div className="flex gap-2">
-                    <input 
-                      type="file" 
-                      ref={fileInputRef} 
-                      className="hidden" 
-                      accept="image/*" 
-                      onChange={handleFileUpload}
-                    />
-                    <Button 
-                      variant="outline" 
-                      onClick={() => fileInputRef.current?.click()} 
-                      disabled={isUploading}
-                      className="gap-2 shrink-0 border-primary/20 hover:bg-primary/10"
-                    >
-                      {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                      رفع من الجهاز
+                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileUpload} />
+                    <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading} className="gap-2 shrink-0 border-primary/20">
+                      {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} رفع جديد
                     </Button>
-                    <Input 
-                      value={formData.imageUrl} 
-                      onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
-                      className="bg-white/5 border-primary/20 flex-1 text-right" 
-                    />
+                    <Input value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} className="bg-white/5 border-primary/20 flex-1 text-right" />
                   </div>
                 </div>
-
-                {isUploading && (
-                  <Alert className="bg-primary/10 border-primary/20 animate-pulse">
-                    <Clock className="h-4 w-4 text-primary" />
-                    <AlertTitle>جاري التحديث الرقمي ({Math.round(uploadProgress)}%)...</AlertTitle>
-                    <AlertDescription>يرجى الانتظار حتى اكتمال الرفع أو إلغاء العملية تلقائياً بعد 30 ثانية.</AlertDescription>
-                  </Alert>
-                )}
 
                 {formData.imageUrl && !isUploading && (
                   <div className="relative aspect-video rounded-2xl overflow-hidden border border-primary/20 bg-black/20">
                     <img src={formData.imageUrl} alt="NFT Preview" className="w-full h-full object-contain" />
                   </div>
                 )}
-
-                <div className="space-y-2 pt-4">
-                  <Label>اسم التوكن</Label>
-                  <Input 
-                    value={formData.nftTitle} 
-                    onChange={e => setFormData({...formData, nftTitle: e.target.value})} 
-                    className="bg-white/5 border-primary/20 text-right" 
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>وصف Metadata</Label>
-                  <Textarea 
-                    value={formData.nftDescription} 
-                    onChange={e => setFormData({...formData, nftDescription: e.target.value})} 
-                    className="bg-white/5 border-primary/20 text-right" 
-                  />
-                </div>
               </div>
             </div>
           </div>
@@ -299,7 +264,7 @@ export default function EditEventPage() {
           <div className="space-y-6">
             <div className="bg-card p-6 rounded-3xl border border-white/5 space-y-4">
               <h3 className="font-bold flex items-center gap-2 justify-end">
-                <Database className="h-4 w-4 text-primary" /> اللوجستيات
+                <Database className="h-4 w-4 text-primary" /> الجدولة والسعة
               </h3>
               <div className="space-y-3">
                 <div className="space-y-1">
@@ -317,20 +282,22 @@ export default function EditEventPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <div className="space-y-1">
-                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">السعر ($)</Label>
-                    <Input value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="bg-white/5 h-9 text-right" />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">الإمداد</Label>
-                    <Input value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} className="bg-white/5 h-9 text-right" />
+                  {eventType === 'match' && (
+                    <div className="space-y-1">
+                      <Label className="text-[10px] uppercase font-bold text-muted-foreground">السعر (ر.س)</Label>
+                      <Input value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} className="bg-white/5 h-9 text-right font-black" />
+                    </div>
+                  )}
+                  <div className={cn("space-y-1", eventType === 'conference' ? "col-span-2" : "")}>
+                    <Label className="text-[10px] uppercase font-bold text-muted-foreground">{eventType === 'conference' ? 'عدد المدعوين' : 'السعة الإجمالية'}</Label>
+                    <Input value={formData.capacity} onChange={e => setFormData({...formData, capacity: e.target.value})} className="bg-white/5 h-9 text-right font-black" />
                   </div>
                 </div>
               </div>
             </div>
 
-            <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full h-14 bg-primary text-primary-foreground font-black text-lg shadow-xl shadow-primary/20">
-              {isSaving ? <Loader2 className="animate-spin mr-2" /> : "Update Collection"}
+            <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full h-14 bg-primary text-primary-foreground font-black text-lg shadow-xl shadow-primary/20 rounded-2xl">
+              {isSaving ? <Loader2 className="animate-spin mr-2" /> : "تحديث البيانات"}
             </Button>
           </div>
         </div>
