@@ -121,14 +121,9 @@ export default function Home() {
                   </div>
                   {" "}على السلسلة
                 </h1>
-              <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed font-black">
-نحن نبني طبقة موحدة لسوق التذاكر تمكّن أي منصة من إصدار تذاكر على البلوكتشين،
-مع تحكم كامل في إعادة البيع ومنع البوتات.
-
-EvenTix هو حل هجين يقوم بتوثيق كل تذكرة تلقائيًا على شبكة Polygon،
-مع إمكانية تحويلها إلى NFT قابل للتداول بشكل آمن وموثوق.
+              <p className="text-muted-foreground text-lg md:text-xl max-w-lg leading-relaxed font-black">إيفين تيكس تشين هو بروتوكول متقدم لإدارة التذاكر في الشرق الأوسط، حيث يتم إصدار جميع التذاكر على البلوكتشين لضمان الأمان والشفافية، مع خيار تحويلها إلى NFT لتمكين التداول الذكي وإعادة البيع المنظم
 </p>
->>>>>>> 6c530b1 (Update: improve NFT ticketing logic and pitch structure)
+
                 <div className="flex flex-wrap gap-4 pt-4 justify-start">
                   <button onClick={() => setIsAuthOpen(true)} className="mac-button text-lg font-black">ابدأ تجربتك الآن</button>
                   <Button asChild variant="outline" size="lg" className="h-14 px-8 rounded-2xl border-white/10 hover:bg-white/5 text-lg font-black text-white">
@@ -222,7 +217,7 @@ EvenTix هو حل هجين يقوم بتوثيق كل تذكرة تلقائيً�
         <section className="container mx-auto px-4 py-20 bg-black" dir="rtl">
           <div className="max-w-4xl mx-auto text-center mb-16 space-y-4">
             <h2 className="text-3xl md:text-5xl font-headline font-black text-white leading-tight">تقنيات الغد، <span className="text-primary">بروح الابتكار</span></h2>
-            <p className="text-muted-foreground text-base md:text-lg font-black max-w-xl mx-auto leading-relaxed">نحن ندرك التحديات التي يوادهها المنظمون والمعجبون. لذلك بنينا بروتوكولاً يسهل سير العمل ويمنحك السيطرة الكاملة.</p>
+            <p className="text-muted-foreground text-base md:text-lg font-black max-w-xl mx-auto leading-relaxed">نحن ندرك التحديات التي يواجهها المنظمون والمعجبون. لذلك بنينا بروتوكولاً يسهل سير العمل ويمنحك السيطرة الكاملة.</p>
           </div>
           <div className="grid lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             <div className="lg:col-span-1 group relative overflow-hidden rounded-[2.5rem] bg-[#0A0D12] border border-white/10 flex flex-col justify-between p-8 transition-all hover:border-primary/30 h-[280px]">
@@ -244,7 +239,7 @@ EvenTix هو حل هجين يقوم بتوثيق كل تذكرة تلقائيً�
               <div className="grid md:grid-cols-2 items-center gap-8">
                 <div className="relative z-10 space-y-3 text-right">
                   <h3 className="text-xl font-black text-white leading-tight">التذاكر كأصول رقمية موثقة</h3>
-                  <p className="text-muted-foreground text-[11px] font-black leading-relaxed">كل التذاكر مسجلة بالبلوكشين فور الشراء، وبإمكانك سكها كـ NFT بعد المباراة اختيارياً للاحتفاظ بها أو تداولها.</p>
+                  <p className="text-muted-foreground text-[11px] font-black leading-relaxed">نحن نبني طبقة موحدة لسوق التذاكر، تمكّن أي منصة من إصدار تذاكر على البلوكتشين، التحكم في إعادة بيعها، ومنع البوتات — مع تحويل كل تذكرة إلى أصل رقمي قابل للتداول والتحكم الكامل.</p>
                 </div>
                 <div className="flex justify-center">
                   <div className="terminal-loader scale-75 md:scale-90">
@@ -369,11 +364,7 @@ EvenTix هو حل هجين يقوم بتوثيق كل تذكرة تلقائيً�
                       </div>
                     </div>
                   </div>
-                  <div className="flex justify-start lg:justify-end">
-                    <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40">
-                      <Zap className="h-5 w-5" />
-                    </div>
-                  </div>
+                  
                 </div>
               </div>
             </div>

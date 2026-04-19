@@ -1,14 +1,13 @@
+
 "use client";
 
-import { useState, Suspense, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mail, Lock, User, Loader2, Wallet } from "lucide-react";
 import { useAuth, useFirestore } from "@/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInAnonymously } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -34,6 +33,7 @@ function AuthContainer() {
   const [activeTab, setActiveTab] = useState(searchParams.get("mode") === "signup" ? "signup" : "login");
   const [showPolicy, setShowPolicy] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
+  const [isConnectingWallet, setIsConnectingWallet] = useState(false);
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [signupData, setSignupData] = useState({ name: "", email: "", password: "", confirmPassword: "" });
@@ -91,9 +91,9 @@ function AuthContainer() {
         updatedAt: serverTimestamp()
       });
 
-      sendWelcomeEmail(signupData.email, signupData.name).catch(console.error);
+      sendWelcomeEmail(signupData.email, signupData.name).catch(() => {});
 
-      toast({ title: "تم إنشاء الخزنة", description: "مرحباً بك في فيري تيكس! تم تأمين هويتك الرقمية." });
+      toast({ title: "تم إنشاء الخزنة", description: "تم تأمين هويتك الرقمية بنجاح." });
       router.push(returnTo);
     } catch (error: any) {
       toast({ variant: "destructive", title: "فشل التسجيل", description: error.message || "تعذر إنشاء الحساب." });
@@ -103,38 +103,37 @@ function AuthContainer() {
   };
 
   const connectWallet = async () => {
-    if (typeof window === "undefined" || isLoading) return;
+    if (typeof window === "undefined" || isConnectingWallet) return;
     
-    setIsLoading(true);
+    setIsConnectingWallet(true);
     setLoadingText("جاري ربط المحفظة");
 
     try {
       const ethereum = (window as any).ethereum;
       if (!ethereum) {
         window.open('https://metamask.io/download/', '_blank');
-        setIsLoading(false);
+        setIsConnectingWallet(false);
         return;
       }
 
-      // محاولة طلب الحسابات ومعالجة الخطأ -32002 داخلياً
+      // طلب الحسابات مع معالجة الأخطاء الشائعة بصمت
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
         .catch((err: any) => {
           if (err.code === -32002) {
-            throw new Error("هناك طلب اتصال معلق بالفعل في MetaMask. يرجى مراجعة الإضافة يدوياً.");
-          }
-          if (err.code === 4001) {
-            throw new Error("تم رفض طلب الاتصال من قبل المستخدم.");
+            console.warn("MetaMask: Pending request already exists.");
+            return null;
           }
           throw err;
         });
 
       if (!accounts || accounts.length === 0) {
-        throw new Error("لم يتم اختيار أي حساب للاتصال.");
+        setIsConnectingWallet(false);
+        return;
       }
 
       const walletAddress = accounts[0];
+      setIsLoading(true);
       
-      // تسجيل دخول مجهول في Firebase لربط المحفظة
       const credential = await signInAnonymously(auth);
       
       await setDoc(doc(firestore, "users", credential.user.uid), {
@@ -146,13 +145,9 @@ function AuthContainer() {
       toast({ title: "تم ربط المحفظة", description: "تم الدخول عبر المحفظة بنجاح." });
       router.push(returnTo);
     } catch (err: any) {
-      console.error("MetaMask Connection Suppressed:", err);
-      toast({ 
-        variant: "destructive", 
-        title: "تنبيه البروتوكول", 
-        description: err.message || "تعذر الاتصال بالمحفظة. تأكد من فتح إضافة MetaMask."
-      });
+      console.error("MetaMask Connection Error Suppressed");
     } finally {
+      setIsConnectingWallet(false);
       setIsLoading(false);
     }
   };
@@ -160,7 +155,7 @@ function AuthContainer() {
   return (
     <div className="w-full max-w-md space-y-8">
       <div className="text-center space-y-4">
-        <div className="relative w-full h-24 mb-2">
+        <div className="relative w-full h-20 md:h-24 mb-2">
           <Image 
             src="https://res.cloudinary.com/ddznxtb6f/image/upload/q_auto/f_auto/v1776511752/image-removebg-preview_98_zrfpns.png" 
             alt="VeriTix Logo" 
@@ -170,20 +165,20 @@ function AuthContainer() {
           />
         </div>
         <div className="space-y-1">
-          <h1 className="text-3xl font-headline font-bold text-white">مرحباً بك في <span className="text-primary">فيري تيكس</span></h1>
-          <p className="text-muted-foreground text-sm font-bold">وصول آمن إلى خزنتك الرقمية للفعاليات.</p>
+          <h1 className="text-2xl md:text-3xl font-headline font-black text-white">مرحباً بك في <span className="text-primary">فيري تيكس</span></h1>
+          <p className="text-muted-foreground text-xs md:text-sm font-bold">وصول آمن إلى خزنتك الرقمية للفعاليات.</p>
         </div>
       </div>
 
       <Card className="border-white/5 bg-card/50 backdrop-blur-md overflow-hidden rounded-[2.5rem] shadow-2xl">
-        <CardContent className="p-8">
+        <CardContent className="p-6 md:p-8">
           <AnimatePresence mode="wait">
             {isLoading ? (
               <motion.div 
                 key="loader"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 className="loader-page"
               >
                 <div className="loader-container">
@@ -197,40 +192,35 @@ function AuthContainer() {
             ) : (
               <motion.div 
                 key="form"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-8"
+                className="space-y-6 md:space-y-8"
               >
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 h-12 bg-white/5 p-1 rounded-xl mb-8">
-                    <TabsTrigger value="login" className="rounded-lg font-black data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-primary transition-all">دخول</TabsTrigger>
-                    <TabsTrigger value="signup" className="rounded-lg font-black data-[state=active]:bg-[#1a1a1a] data-[state=active]:text-primary transition-all">إنشاء حساب</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-2 h-12 bg-white/5 p-1 rounded-xl mb-6">
+                    <TabsTrigger value="login" className="rounded-lg font-black transition-all">دخول</TabsTrigger>
+                    <TabsTrigger value="signup" className="rounded-lg font-black transition-all">إنشاء حساب</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="login" className="space-y-4">
                     <form onSubmit={handleLogin} className="space-y-4">
-                      <div className="relative group">
-                        <Input 
-                          type="email" 
-                          placeholder="البريد الإلكتروني" 
-                          className="h-14 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
-                          value={loginData.email}
-                          onChange={(e) => setLoginData({...loginData, email: e.target.value})}
-                          required
-                        />
-                      </div>
-                      <div className="relative group">
-                        <Input 
-                          type="password" 
-                          placeholder="كلمة المرور" 
-                          className="h-14 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
-                          value={loginData.password}
-                          onChange={(e) => setLoginData({...loginData, password: e.target.value})}
-                          required
-                        />
-                      </div>
-                      <Button type="submit" className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black text-lg rounded-xl shadow-lg shadow-primary/20">
+                      <Input 
+                        type="email" 
+                        placeholder="البريد الإلكتروني" 
+                        className="h-14 bg-[#121212] border-white/5 rounded-xl font-bold text-right"
+                        value={loginData.email}
+                        onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                        required
+                      />
+                      <Input 
+                        type="password" 
+                        placeholder="كلمة المرور" 
+                        className="h-14 bg-[#121212] border-white/5 rounded-xl font-bold text-right"
+                        value={loginData.password}
+                        onChange={(e) => setLoginData({...loginData, password: e.target.value})}
+                        required
+                      />
+                      <Button type="submit" className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-black text-lg rounded-xl">
                         تسجيل الدخول
                       </Button>
                     </form>
@@ -240,7 +230,7 @@ function AuthContainer() {
                     <form onSubmit={handleSignup} className="space-y-4">
                       <Input 
                         placeholder="الاسم الكامل" 
-                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
+                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right"
                         value={signupData.name}
                         onChange={(e) => setSignupData({...signupData, name: e.target.value})}
                         required
@@ -248,7 +238,7 @@ function AuthContainer() {
                       <Input 
                         type="email" 
                         placeholder="البريد الإلكتروني" 
-                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right focus:border-primary/50"
+                        className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right"
                         value={signupData.email}
                         onChange={(e) => setSignupData({...signupData, email: e.target.value})}
                         required
@@ -257,7 +247,7 @@ function AuthContainer() {
                         <Input 
                           type="password" 
                           placeholder="كلمة المرور" 
-                          className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs focus:border-primary/50"
+                          className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs"
                           value={signupData.password}
                           onChange={(e) => setSignupData({...signupData, password: e.target.value})}
                           required
@@ -265,29 +255,21 @@ function AuthContainer() {
                         <Input 
                           type="password" 
                           placeholder="تأكيد" 
-                          className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs focus:border-primary/50"
+                          className="h-12 bg-[#121212] border-white/5 rounded-xl font-bold text-right text-xs"
                           value={signupData.confirmPassword}
                           onChange={(e) => setSignupData({...signupData, confirmPassword: e.target.value})}
                           required
                         />
                       </div>
 
-                      <div className="flex items-start gap-3 py-2 px-1">
+                      <div className="flex items-start gap-3 py-2">
                         <Checkbox 
                           id="page-terms" 
                           checked={isAccepted} 
                           onCheckedChange={(val) => setIsAccepted(val as boolean)}
-                          className="mt-1 border-white/20 data-[state=checked]:bg-primary"
                         />
                         <label htmlFor="page-terms" className="text-[10px] leading-relaxed text-muted-foreground font-bold cursor-pointer">
-                          أوافق على{" "}
-                          <button 
-                            type="button"
-                            onClick={() => setShowPolicy(true)} 
-                            className="text-primary hover:underline underline-offset-4 font-black"
-                          >
-                            سياسة الخصوصية وأحكام الاستخدام
-                          </button>
+                          أوافق على <button type="button" onClick={() => setShowPolicy(true)} className="text-primary font-black">سياسة الخصوصية وأحكام الاستخدام</button>
                         </label>
                       </div>
 
@@ -303,23 +285,22 @@ function AuthContainer() {
                   <span className="relative bg-[#0a0a0a] px-4 text-[10px] font-black text-muted-foreground uppercase tracking-widest">أو عبر الشبكة</span>
                 </div>
 
-                <div className="grid grid-cols-1 gap-3">
-                  <Button 
-                    variant="outline" 
-                    onClick={connectWallet}
-                    className="h-14 bg-[#121212] border-white/5 hover:bg-white/5 rounded-xl flex items-center justify-center gap-3 font-black text-white group"
-                  >
-                    <div className="relative w-6 h-6 group-hover:scale-110 transition-transform">
-                      <Image 
-                        src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1774395637/MetaMask_Fox.svg_jx0cq7.png" 
-                        alt="MetaMask" 
-                        fill 
-                        className="object-contain" 
-                      />
-                    </div>
-                    دخول عبر MetaMask
-                  </Button>
-                </div>
+                <Button 
+                  variant="outline" 
+                  onClick={connectWallet}
+                  disabled={isConnectingWallet}
+                  className="w-full h-14 bg-[#121212] border-white/5 hover:bg-white/5 rounded-xl flex items-center justify-center gap-3 font-black text-white group"
+                >
+                  <div className="relative w-6 h-6">
+                    <Image 
+                      src="https://res.cloudinary.com/ddznxtb6f/image/upload/v1774395637/MetaMask_Fox.svg_jx0cq7.png" 
+                      alt="MetaMask" 
+                      fill 
+                      className="object-contain" 
+                    />
+                  </div>
+                  {isConnectingWallet ? "جاري الاتصال..." : "دخول عبر MetaMask"}
+                </Button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -333,10 +314,10 @@ function AuthContainer() {
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground text-right selection:bg-primary/30" dir="rtl">
+    <div className="min-h-screen flex flex-col bg-background text-foreground text-right" dir="rtl">
       <Navbar />
       <main className="flex-1 flex items-center justify-center p-4">
-        <Suspense fallback={<div className="flex justify-center py-20 text-primary animate-pulse font-black">جاري تهيئة البروتوكول...</div>}>
+        <Suspense fallback={<div className="text-primary animate-pulse font-black">جاري التهيئة...</div>}>
           <AuthContainer />
         </Suspense>
       </main>
