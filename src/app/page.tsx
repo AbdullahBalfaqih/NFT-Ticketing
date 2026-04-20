@@ -146,7 +146,7 @@ export default function Home() {
 
         {/* White Section: Search & Events */}
         <div className="bg-[#f5f5f5] pb-24 relative z-20">
-          <section className="container mx-auto px-4 mb-20 -mt-10" dir="rtl">
+           <section className="container mx-auto px-4 mb-20 pt-16" dir="rtl">
             <div className="bg-white border border-black/5 p-2 px-4 md:pr-6 rounded-2xl md:rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.1)] relative z-40 max-w-4xl mx-auto flex flex-col md:flex-row items-center gap-4 md:gap-2 py-4 md:py-2">
               <div className="flex-1 relative flex items-center w-full">
                 <Search className="absolute right-0 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-300" />

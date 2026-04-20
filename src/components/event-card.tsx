@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -16,71 +17,76 @@ export function EventCard({ event }: EventCardProps) {
   const isConference = event.eventType === 'conference';
 
   return (
-    <div className="ticket-widget no-copy h-full" dir="rtl">
-      <div className="top --flex-column h-full">
+    <div className="ticket-widget no-copy" dir="rtl">
+      <div className="top --flex-column">
         {/* العناوين العلوية */}
-        <div className="space-y-1">
-          <div className="bandname -bold">{event.name}</div>
-          {/* التاريخ في المساحة الفارغة العلوية */}
-          <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-black">
-            <Calendar className="h-3 w-3 text-primary" />
-            <span>{event.date}</span>
-            <span className="opacity-30">|</span>
-            <Clock className="h-3 w-3 text-primary" />
-            <span>{event.time}</span>
+        <div className="space-y-2">
+          <div className="bandname">{event.name}</div>
+          <div className="flex items-center flex-wrap gap-x-4 gap-y-1">
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-black">
+              <Calendar className="h-3 w-3 text-primary" />
+              <span>{event.date}</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-black">
+              <Clock className="h-3 w-3 text-primary" />
+              <span>{event.time}</span>
+            </div>
           </div>
         </div>
         
         {/* الصورة */}
-        <div className="relative group mt-4">
+        <div className="relative">
           <img 
             src={event.imageUrl} 
             alt={event.name} 
-            className="event-banner w-full rounded-lg"
+            className="event-banner"
             onContextMenu={(e) => e.preventDefault()}
             draggable={false}
           />
         </div>
 
-        {/* البيانات السفلية (Deetz) */}
-        <div className="deetz mt-auto flex items-end justify-between gap-4 py-4 px-[18px]">
-          {/* اليمين: الموقع - يظهر كاملاً */}
-          <div className="flex-1 text-right space-y-1 overflow-hidden">
-            <div className="flex items-center gap-1 text-[10px] text-muted-foreground font-black uppercase">
-              <span>الموقع</span>
-              <MapPin className="h-2.5 w-2.5" />
-            </div>
-            <div className="text-xs font-bold text-slate-900 leading-tight break-words">
-              {event.venue}
-            </div>
-            {isConference && (
-              <div className="pt-1">
-                <Badge className="bg-primary text-white border-none font-black text-[8px] px-2 py-0.5 shadow-lg shadow-primary/10">
-                  بدعوة خاصة
-                </Badge>
-              </div>
-            )}
-          </div>
-          
-          {/* اليسار: السعر - الرقم يليه الرمز (SAR بعد الرقم) */}
+        {/* البيانات السفلية */}
+        <div className="deetz">
+          {/* السعر */}
           {!isConference && (
-            <div className="shrink-0 text-left space-y-1">
-              <div className="text-[10px] text-muted-foreground font-black uppercase">سعر التذكرة</div>
-              <div className="flex items-center gap-1 justify-end">
-                <span className="text-xl font-black text-primary leading-none">{event.ticketPrice}</span>
-                <img src={SAR_LOGO} style={{ height: '16px', width: 'auto' }} className="object-contain" alt="ر.س" />
+            <div className="text-right">
+              <div className="label">سعر التذكرة</div>
+              <div className="flex items-center gap-1">
+                <span className="cost">{event.ticketPrice}</span>
+                <img src={SAR_LOGO} className="h-5 w-auto object-contain" alt="ر.س" />
               </div>
             </div>
           )}
+
+          {/* الموقع */}
+          <div className="flex-1 text-left">
+            <div className="label flex items-center gap-1 justify-end">
+              <span>الموقع</span>
+              <MapPin className="h-2.5 w-2.5" />
+            </div>
+            <div className="text-xs font-bold text-slate-900 leading-tight">
+              {event.venue}
+            </div>
+          </div>
         </div>
       </div>
+
       <div className="rip"></div>
+
       <div className="bottom">
         <div className="barcode"></div>
         <Link className="buy" href={`/events/${event.id}`}>
           {isConference ? 'تفاصيل الدعوة' : 'احجز تذكرتك'}
         </Link>
       </div>
+
+      {isConference && (
+        <div className="absolute top-4 left-4">
+          <Badge className="bg-primary/10 text-primary border-primary/20 font-black text-[9px] px-2 py-0.5">
+            بدعوة خاصة
+          </Badge>
+        </div>
+      )}
     </div>
   );
 }
