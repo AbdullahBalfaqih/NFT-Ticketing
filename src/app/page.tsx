@@ -104,7 +104,7 @@ export default function Home() {
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div className="space-y-8 animate-in fade-in slide-in-from-right-8 duration-700 text-right" dir="rtl">
                 <h1 className="font-headline text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
-                  المنصة النهائية لتأمين{" "}
+                  البروتوكــــــول النهائي لتأمين{" "}
                   <div className="h-[1.2em] inline-flex items-center align-middle overflow-hidden px-2 relative">
                     <AnimatePresence mode="popLayout">
                       <motion.span
