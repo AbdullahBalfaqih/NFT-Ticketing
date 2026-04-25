@@ -155,7 +155,7 @@ function AuthContainer() {
       <div className="text-center space-y-4">
         <div className="relative w-full h-20 md:h-24 mb-2">
           <Image 
-            src="/logo.svg" 
+            src="/logo.png" 
             alt="VeriTix Logo" 
             fill 
             className="object-contain" 

@@ -158,7 +158,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               <motion.div key="form" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 md:p-8 space-y-6 md:space-y-8">
                 <DialogHeader className="flex flex-col items-center text-center space-y-4">
                   <div className="relative w-full h-20 mb-2">
-                    <Image src="/logo.svg" alt="EvenTix Logo" fill className="object-contain" />
+                    <Image src="/logo.png" alt="EvenTix Logo" fill className="object-contain" />
                   </div>
                   <DialogTitle className="text-xl font-headline font-black">دخول البروتوكول</DialogTitle>
                 </DialogHeader>
