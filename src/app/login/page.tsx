@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
@@ -116,11 +115,10 @@ function AuthContainer() {
         return;
       }
 
-      // طلب الحسابات مع معالجة الأخطاء الشائعة بصمت
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
         .catch((err: any) => {
           if (err.code === -32002) {
-            console.warn("MetaMask: Pending request already exists.");
+            toast({ title: "طلب معلق", description: "يرجى مراجعة إشعار MetaMask وفتح الطلب المعلق." });
             return null;
           }
           throw err;
@@ -145,7 +143,7 @@ function AuthContainer() {
       toast({ title: "تم ربط المحفظة", description: "تم الدخول عبر المحفظة بنجاح." });
       router.push(returnTo);
     } catch (err: any) {
-      console.error("MetaMask Connection Error Suppressed");
+      console.warn("MetaMask connection failed:", err.message);
     } finally {
       setIsConnectingWallet(false);
       setIsLoading(false);
@@ -157,7 +155,7 @@ function AuthContainer() {
       <div className="text-center space-y-4">
         <div className="relative w-full h-20 md:h-24 mb-2">
           <Image 
-            src="https://res.cloudinary.com/ddznxtb6f/image/upload/q_auto/f_auto/v1776511752/image-removebg-preview_98_zrfpns.png" 
+            src="/logo.svg" 
             alt="VeriTix Logo" 
             fill 
             className="object-contain" 

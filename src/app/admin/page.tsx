@@ -47,7 +47,6 @@ export default function AdminDashboard() {
 
   const handleAiAnalysis = async () => {
     setIsAiAnalyzing(true);
-    // محاكاة تحليل الوكيل الذكي VTX-Analyst
     await new Promise(r => setTimeout(r, 2000));
     setAiReport("تم رصد 12 محاولة سك آلي محجوبة بنجاح. معدل التحقق البشري مستقر عند 98%. ننصح بزيادة صعوبة الـ PoW للفعاليات ذات الطلب المرتفع لتعزيز الحماية.");
     setIsAiAnalyzing(false);
@@ -108,7 +107,6 @@ export default function AdminDashboard() {
       <Navbar />
       
       <main className="flex-1 container mx-auto px-4 py-12 space-y-8">
-        {/* AI Agent Banner */}
         <section className="relative p-8 rounded-[2.5rem] bg-gradient-to-r from-primary/20 via-primary/5 to-transparent border border-primary/20 overflow-hidden group">
           <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10 flex-row-reverse">
