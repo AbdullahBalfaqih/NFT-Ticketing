@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -40,12 +39,11 @@ export function Navbar() {
       <div className="w-full h-20 flex justify-center items-center">
         <div className="container mx-auto px-4 flex items-center justify-between h-full max-w-full">
           
-          {/* Left Section: Logo Only - Bigger Size */}
           <div className="flex items-center justify-start flex-1 h-full">
             <Link href="/" className="flex items-center group h-full">
               <div className="relative w-40 h-full transition-transform duration-300 group-hover:scale-105">
                 <Image 
-                  src="https://res.cloudinary.com/ddznxtb6f/image/upload/q_auto/f_auto/v1776511752/image-removebg-preview_98_zrfpns.png" 
+                  src="/logo.svg" 
                   alt="EvenTix Logo" 
                   fill 
                   className="object-contain" 
@@ -54,7 +52,6 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Center Section: Navigation Links */}
           <div className="hidden md:flex items-center gap-8 justify-center flex-1">
             {navLinks.map((link) => (
               <Link 
@@ -70,7 +67,6 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Right Section: Action Buttons */}
           <div className="flex items-center gap-3 flex-1 justify-end">
             {user ? (
               <div className="flex items-center gap-2">
