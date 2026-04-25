@@ -259,7 +259,7 @@ export default function Home() {
           <div className="container mx-auto flex flex-col items-center text-center">
             <div className="relative mb-8">
               <div className="absolute inset-0 bg-primary/20 blur-[40px] rounded-full scale-150 -z-10" />
-              <Image src="/logo.svg" alt="Logo CTA" width={120} height={120} className="relative z-10" />
+              <Image src="/logo.png" alt="Logo CTA" width={120} height={120} className="relative z-10" />
             </div>
             <h2 className="text-3xl md:text-5xl font-headline font-black text-slate-900 max-w-2xl leading-tight mb-6">ابدأ تأمين <span className="text-primary">تجربتك الرقمية</span> اليوم</h2>
             <p className="text-muted-foreground text-lg md:text-xl max-w-xl mb-10 font-black">انضم لآلاف المعجبين الذين يؤمنون تذاكرهم عبر بروتوكول EvenTix Chain.</p>
@@ -303,7 +303,7 @@ export default function Home() {
               <div className="flex flex-col items-start lg:items-end">
                 <Link href="/" className="flex items-center group mb-8">
                   <div className="relative w-64 h-24">
-                    <Image src="/logo.svg" alt="Footer Logo" fill className="object-contain" />
+                    <Image src="/logo.png" alt="Footer Logo" fill className="object-contain" />
                   </div>
                 </Link>
                 
@@ -358,11 +358,7 @@ export default function Home() {
                   </div>
                 </div>
                 
-                <div className="flex justify-start lg:justify-end mt-4">
-                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white/40">
-                    <Zap className="h-5 w-5" />
-                  </div>
-                </div>
+                
               </div>
             </div>
             

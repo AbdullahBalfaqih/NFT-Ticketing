@@ -41,7 +41,7 @@ export function Navbar() {
           
           <div className="flex items-center justify-start flex-1 h-full">
             <Link href="/" className="flex items-center group h-full">
-              <div className="relative w-40 h-full transition-transform duration-300 group-hover:scale-105">
+<div className="relative w-40 h-full transition-transform duration-300 group-hover:scale-[2]">
                 <Image 
                   src="/logo.png" 
                   alt="EvenTix Logo" 
